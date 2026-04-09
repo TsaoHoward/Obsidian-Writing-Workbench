@@ -9,6 +9,8 @@
   },
   "scripts": {
     "build": "corepack pnpm -r build",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "typecheck": "corepack pnpm -r typecheck",
     "dev:api": "corepack pnpm --filter @oww/api-server dev",
     "dev:mcp": "corepack pnpm --filter @oww/mcp-server dev",
@@ -17,6 +19,7 @@
   "devDependencies": {
     "@types/node": "*",
     "tsx": "*",
-    "typescript": "*"
+    "typescript": "*",
+    "vitest": "*"
   }
 }
