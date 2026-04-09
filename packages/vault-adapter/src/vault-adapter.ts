@@ -89,9 +89,14 @@ export class VaultAdapter {
     await fs.mkdir(path.dirname(absolutePath), { recursive: true });
 
     try {
+      const sanitizedFrontmatter = Object.fromEntries(
+        Object.entries(validatedNote.frontmatter as unknown as Record<string, unknown>).filter(
+          ([_key, value]) => value !== undefined
+        )
+      );
       const markdown = matter.stringify(
         validatedNote.body,
-        validatedNote.frontmatter as unknown as Record<string, unknown>
+        sanitizedFrontmatter
       );
       await fs.writeFile(absolutePath, markdown, "utf8");
       return validatedNote;

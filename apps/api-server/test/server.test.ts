@@ -128,4 +128,89 @@ describe("API server", () => {
       await rm(vaultRoot, { recursive: true, force: true });
     }
   });
+
+  it("validates notes, scaffolds templates, and creates claim notes", async () => {
+    const vaultRoot = await createTestVault();
+    const app = buildServer({
+      vaultRoot,
+      host: "127.0.0.1",
+      port: 3000
+    });
+
+    try {
+      const validateResponse = await app.inject({
+        method: "POST",
+        url: "/notes/validate",
+        payload: {
+          path: "02 Sources/validated-source.md",
+          frontmatter: {
+            id: "source-validated-source",
+            type: "source",
+            title: "Validated source",
+            status: "active",
+            tags: ["test"],
+            createdAt: "2026-04-09T00:00:00Z",
+            updatedAt: "2026-04-09T00:00:00Z",
+            sourceKind: "website",
+            authors: ["Example Author"],
+            topicIds: ["topic-test"],
+            claimIds: []
+          },
+          body: "Validated body."
+        }
+      });
+      expect(validateResponse.statusCode).toBe(200);
+      expect(validateResponse.json().valid).toBe(true);
+      expect(validateResponse.json().note.frontmatter.id).toBe("source-validated-source");
+
+      const templatePreviewResponse = await app.inject({
+        method: "POST",
+        url: "/notes/template",
+        payload: {
+          type: "topic",
+          title: "Template preview topic",
+          question: "What does a generated topic look like?"
+        }
+      });
+      expect(templatePreviewResponse.statusCode).toBe(200);
+      expect(templatePreviewResponse.json().persisted).toBe(false);
+      expect(templatePreviewResponse.json().note.path).toBe("01 Topics/topic-template-preview-topic.md");
+
+      const templateWriteResponse = await app.inject({
+        method: "POST",
+        url: "/notes/template",
+        payload: {
+          type: "source",
+          title: "Template source",
+          topicIds: ["topic-test"],
+          sourceKind: "website",
+          write: true
+        }
+      });
+      expect(templateWriteResponse.statusCode).toBe(201);
+      expect(templateWriteResponse.json().persisted).toBe(true);
+      await expect(readFile(path.join(vaultRoot, "02 Sources/source-template-source.md"), "utf8")).resolves.toContain(
+        "Template source"
+      );
+
+      const claimResponse = await app.inject({
+        method: "POST",
+        url: "/claims",
+        payload: {
+          title: "Canonical vaults improve portability",
+          statement: "Keeping the vault canonical makes the system portable across clients.",
+          topicIds: ["topic-test"],
+          sourceIds: ["source-validated-source"]
+        }
+      });
+      expect(claimResponse.statusCode).toBe(201);
+      expect(claimResponse.json().note.frontmatter.type).toBe("claim");
+      await expect(
+        readFile(path.join(vaultRoot, "03 Claims/claim-canonical-vaults-improve-portability.md"), "utf8")
+      ).resolves.toContain("portable across clients");
+    } finally {
+      await app.close();
+      await rm(vaultRoot, { recursive: true, force: true });
+    }
+  });
 });

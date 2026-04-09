@@ -4,7 +4,13 @@ import {
   WorkbenchError,
   noteKinds
 } from "@oww/core";
-import { validateNoteDocument } from "@oww/note-schema";
+import {
+  createClaimNote,
+  createClaimNoteInputSchema,
+  createNoteFromTemplate,
+  createNoteFromTemplateInputSchema,
+  validateNoteDocument
+} from "@oww/note-schema";
 import { SearchService } from "@oww/search";
 import { VaultAdapter } from "@oww/vault-adapter";
 import Fastify from "fastify";
@@ -25,6 +31,10 @@ const upsertNoteBodySchema = z.object({
   path: z.string().trim().min(1),
   frontmatter: z.record(z.string(), z.unknown()),
   body: z.string()
+});
+
+const createTemplateCommandSchema = z.object({
+  write: z.boolean().optional()
 });
 
 export function buildServer(config: ApiServerConfig) {
@@ -68,6 +78,46 @@ export function buildServer(config: ApiServerConfig) {
     const note = await vaultAdapter.readValidatedNote(query.path);
 
     return { note };
+  });
+
+  app.post("/notes/validate", async (request) => {
+    const body = upsertNoteBodySchema.parse(request.body);
+    const note = validateNoteDocument(body);
+
+    return {
+      valid: true,
+      note
+    };
+  });
+
+  app.post("/notes/template", async (request, reply) => {
+    const write = createTemplateCommandSchema.parse(request.body).write ?? false;
+    const templateInput = createNoteFromTemplateInputSchema.parse(request.body);
+    const note = createNoteFromTemplate(templateInput);
+
+    if (!write) {
+      reply.code(200);
+      return {
+        note,
+        persisted: false
+      };
+    }
+
+    const savedNote = await vaultAdapter.upsertNote(note);
+    reply.code(201);
+    return {
+      note: savedNote,
+      persisted: true
+    };
+  });
+
+  app.post("/claims", async (request, reply) => {
+    const body = createClaimNoteInputSchema.parse(request.body);
+    const note = createClaimNote(body);
+    const savedNote = await vaultAdapter.upsertNote(note);
+
+    reply.code(201);
+    return { note: savedNote };
   });
 
   app.put("/note", async (request, reply) => {
