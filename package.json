@@ -1,0 +1,22 @@
+{
+  "name": "obsidian-writing-workbench",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.33.0",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "build": "corepack pnpm -r build",
+    "typecheck": "corepack pnpm -r typecheck",
+    "dev:api": "corepack pnpm --filter @oww/api-server dev",
+    "dev:mcp": "corepack pnpm --filter @oww/mcp-server dev",
+    "dev:worker": "corepack pnpm --filter @oww/worker dev"
+  },
+  "devDependencies": {
+    "@types/node": "*",
+    "tsx": "*",
+    "typescript": "*"
+  }
+}
