@@ -1,3 +1,5 @@
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { z } from "zod";
 
 const workerEnvSchema = z.object({
@@ -10,11 +12,15 @@ export interface WorkerConfig {
   pollMs: number;
 }
 
+const repoRoot = fileURLToPath(new URL("../../..", import.meta.url));
+
 export function loadWorkerConfig(env: NodeJS.ProcessEnv = process.env): WorkerConfig {
   const parsed = workerEnvSchema.parse(env);
 
   return {
-    vaultRoot: parsed.VAULT_ROOT,
+    vaultRoot: path.isAbsolute(parsed.VAULT_ROOT)
+      ? parsed.VAULT_ROOT
+      : path.resolve(repoRoot, parsed.VAULT_ROOT),
     pollMs: parsed.WORKER_POLL_MS
   };
 }

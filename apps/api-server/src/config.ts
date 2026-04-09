@@ -1,3 +1,5 @@
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { z } from "zod";
 
 const apiServerEnvSchema = z.object({
@@ -12,11 +14,15 @@ export interface ApiServerConfig {
   port: number;
 }
 
+const repoRoot = fileURLToPath(new URL("../../..", import.meta.url));
+
 export function loadApiServerConfig(env: NodeJS.ProcessEnv = process.env): ApiServerConfig {
   const parsed = apiServerEnvSchema.parse(env);
 
   return {
-    vaultRoot: parsed.VAULT_ROOT,
+    vaultRoot: path.isAbsolute(parsed.VAULT_ROOT)
+      ? parsed.VAULT_ROOT
+      : path.resolve(repoRoot, parsed.VAULT_ROOT),
     host: parsed.API_HOST,
     port: parsed.API_PORT
   };

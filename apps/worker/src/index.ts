@@ -1,6 +1,12 @@
+import { config as loadDotenv } from "dotenv";
+import { fileURLToPath } from "node:url";
 import { SearchService } from "@oww/search";
 import { VaultAdapter } from "@oww/vault-adapter";
 import { loadWorkerConfig } from "./config.js";
+
+loadDotenv({
+  path: fileURLToPath(new URL("../../../.env", import.meta.url))
+});
 
 async function runPass(searchService: SearchService): Promise<void> {
   const { notes, skipped } = await searchService.listNotes();

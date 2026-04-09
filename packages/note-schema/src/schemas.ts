@@ -11,7 +11,14 @@ import { z } from "zod";
 
 const nonEmptyString = z.string().trim().min(1);
 const idSchema = nonEmptyString;
-const dateTimeSchema = nonEmptyString;
+const normalizedDateStringSchema = z.preprocess((value) => {
+  if (value instanceof Date) {
+    return value.toISOString();
+  }
+
+  return value;
+}, nonEmptyString);
+const dateTimeSchema = normalizedDateStringSchema;
 
 export const baseFrontmatterSchema = z.object({
   id: idSchema,
@@ -39,7 +46,7 @@ export const sourceNoteFrontmatterSchema = baseFrontmatterSchema.extend({
   authors: z.array(nonEmptyString).default([]),
   url: z.string().url().optional(),
   citation: nonEmptyString.optional(),
-  publishedAt: nonEmptyString.optional(),
+  publishedAt: normalizedDateStringSchema.optional(),
   topicIds: z.array(idSchema).default([]),
   claimIds: z.array(idSchema).default([]),
   reliability: z.enum(["high", "medium", "low"]).optional()

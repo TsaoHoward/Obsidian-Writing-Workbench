@@ -17,6 +17,7 @@
     "@oww/note-schema": "workspace:*",
     "@oww/search": "workspace:*",
     "@oww/vault-adapter": "workspace:*",
+    "dotenv": "*",
     "zod": "*"
   }
 }

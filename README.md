@@ -94,7 +94,7 @@ Protected folders are blocked from writes in v1. Destructive operations are inte
 ## Quick start
 
 1. Install dependencies with `pnpm install`.
-2. Set `VAULT_ROOT` to your Obsidian vault path.
+2. For local development, use the built-in `sandbox/dev-vault` path or point `VAULT_ROOT` to your own vault.
 3. Build everything with `pnpm build`.
 4. Run the API with `pnpm dev:api`.
 5. Run the MCP server with `pnpm dev:mcp`.
@@ -103,9 +103,16 @@ Protected folders are blocked from writes in v1. Destructive operations are inte
 Example environment:
 
 ```bash
-VAULT_ROOT=/path/to/vault
+VAULT_ROOT=./sandbox/dev-vault
 API_PORT=3000
 ```
+
+## Local dev vault
+
+- Keep your real writing vault outside the repo.
+- Use `sandbox/dev-vault` as a local-only development sandbox.
+- The sandbox is ignored by Git so test notes and generated drafts do not pollute the repository.
+- This gives you a predictable vault layout for backend and MCP testing without coupling the project to production content.
 
 ## API and MCP shape
 

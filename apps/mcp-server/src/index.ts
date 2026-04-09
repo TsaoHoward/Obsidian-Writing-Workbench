@@ -1,3 +1,5 @@
+import { config as loadDotenv } from "dotenv";
+import { fileURLToPath } from "node:url";
 import { validateNoteDocument } from "@oww/note-schema";
 import { SearchService } from "@oww/search";
 import { VaultAdapter } from "@oww/vault-adapter";
@@ -9,6 +11,10 @@ import {
 } from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
 import { loadMcpServerConfig } from "./config.js";
+
+loadDotenv({
+  path: fileURLToPath(new URL("../../../.env", import.meta.url))
+});
 
 const listNotesArgsSchema = z.object({
   type: z.enum(["topic", "source", "claim", "outline", "draft"]).optional(),

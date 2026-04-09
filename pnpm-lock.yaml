@@ -32,6 +32,9 @@ importers:
       '@oww/vault-adapter':
         specifier: workspace:*
         version: link:../../packages/vault-adapter
+      dotenv:
+        specifier: '*'
+        version: 17.4.1
       fastify:
         specifier: '*'
         version: 5.8.4
@@ -56,6 +59,9 @@ importers:
       '@oww/vault-adapter':
         specifier: workspace:*
         version: link:../../packages/vault-adapter
+      dotenv:
+        specifier: '*'
+        version: 17.4.1
       zod:
         specifier: '*'
         version: 4.3.6
@@ -68,6 +74,9 @@ importers:
       '@oww/vault-adapter':
         specifier: workspace:*
         version: link:../../packages/vault-adapter
+      dotenv:
+        specifier: '*'
+        version: 17.4.1
       zod:
         specifier: '*'
         version: 4.3.6
@@ -412,6 +421,10 @@ packages:
   dequal@2.0.3:
     resolution: {integrity: sha512-0je+qPKHEMohvfRTCEo3CrPG6cAzAYgmzKyxRiYSSDkS6eGJdyVJm7WaYA5ECaAD9wLB2T4EEeymA5aFVcYXCA==}
     engines: {node: '>=6'}
+
+  dotenv@17.4.1:
+    resolution: {integrity: sha512-k8DaKGP6r1G30Lx8V4+pCsLzKr8vLmV2paqEj1Y55GdAgJuIqpRp5FfajGF8KtwMxCz9qJc6wUIJnm053d/WCw==}
+    engines: {node: '>=12'}
 
   dunder-proto@1.0.1:
     resolution: {integrity: sha512-KIN/nDJBQRcXw0MLVhZE9iQHmG68qAVIBg9CqmUYjmQIhgij9U5MFvrqkUL5FbtyyzZuOeOt0zdeRe4UY7ct+A==}
@@ -1141,6 +1154,8 @@ snapshots:
   depd@2.0.0: {}
 
   dequal@2.0.3: {}
+
+  dotenv@17.4.1: {}
 
   dunder-proto@1.0.1:
     dependencies:
