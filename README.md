@@ -122,12 +122,18 @@ API_PORT=3000
 - `GET /policies`
 - `GET /notes`
 - `GET /note?path=04 Outlines/example.md`
+- `POST /notes/validate`
+- `POST /notes/template`
+- `POST /claims`
 - `PUT /note`
 
 ### MCP tools
 
 - `oww.list_notes`
 - `oww.read_note`
+- `oww.validate_note`
+- `oww.create_note_from_template`
+- `oww.create_claim_note`
 - `oww.upsert_note`
 - `oww.get_policy`
 

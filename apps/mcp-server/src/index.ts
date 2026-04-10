@@ -1,6 +1,12 @@
 import { config as loadDotenv } from "dotenv";
 import { fileURLToPath } from "node:url";
-import { validateNoteDocument } from "@oww/note-schema";
+import {
+  createClaimNote,
+  createClaimNoteInputSchema,
+  createNoteFromTemplate,
+  createNoteFromTemplateInputSchema,
+  validateNoteDocument
+} from "@oww/note-schema";
 import { SearchService } from "@oww/search";
 import { VaultAdapter } from "@oww/vault-adapter";
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
@@ -30,6 +36,10 @@ const upsertNoteArgsSchema = z.object({
   path: z.string().trim().min(1),
   frontmatter: z.record(z.string(), z.unknown()),
   body: z.string()
+});
+
+const createTemplateCommandSchema = z.object({
+  write: z.boolean().optional()
 });
 
 async function main() {
@@ -86,6 +96,239 @@ async function main() {
         }
       },
       {
+        name: "oww.validate_note",
+        description: "Validate and normalize a note document without writing it to the vault.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            path: {
+              type: "string"
+            },
+            frontmatter: {
+              type: "object"
+            },
+            body: {
+              type: "string"
+            }
+          },
+          required: ["path", "frontmatter", "body"]
+        }
+      },
+      {
+        name: "oww.create_note_from_template",
+        description:
+          "Generate a typed note from a built-in template and optionally persist it when the target folder is writable.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            type: {
+              type: "string",
+              enum: ["topic", "source", "claim", "outline", "draft"]
+            },
+            title: {
+              type: "string"
+            },
+            id: {
+              type: "string"
+            },
+            path: {
+              type: "string"
+            },
+            status: {
+              type: "string",
+              enum: ["seed", "active", "review", "done"]
+            },
+            tags: {
+              type: "array",
+              items: {
+                type: "string"
+              }
+            },
+            body: {
+              type: "string"
+            },
+            write: {
+              type: "boolean"
+            },
+            question: {
+              type: "string"
+            },
+            scope: {
+              type: "string"
+            },
+            sourceIds: {
+              type: "array",
+              items: {
+                type: "string"
+              }
+            },
+            claimIds: {
+              type: "array",
+              items: {
+                type: "string"
+              }
+            },
+            outlineIds: {
+              type: "array",
+              items: {
+                type: "string"
+              }
+            },
+            draftIds: {
+              type: "array",
+              items: {
+                type: "string"
+              }
+            },
+            topicIds: {
+              type: "array",
+              items: {
+                type: "string"
+              }
+            },
+            sourceKind: {
+              type: "string",
+              enum: ["article", "paper", "book", "podcast", "video", "website", "interview", "other"]
+            },
+            authors: {
+              type: "array",
+              items: {
+                type: "string"
+              }
+            },
+            url: {
+              type: "string"
+            },
+            citation: {
+              type: "string"
+            },
+            publishedAt: {
+              type: "string"
+            },
+            reliability: {
+              type: "string",
+              enum: ["high", "medium", "low"]
+            },
+            statement: {
+              type: "string"
+            },
+            stance: {
+              type: "string",
+              enum: ["supporting", "counter", "open-question"]
+            },
+            confidence: {
+              type: "number"
+            },
+            topicId: {
+              type: "string"
+            },
+            stage: {
+              type: "string"
+            },
+            targetAudience: {
+              type: "string"
+            },
+            writingGoal: {
+              type: "string"
+            },
+            outlineId: {
+              type: "string"
+            },
+            targetWords: {
+              type: "number"
+            }
+          },
+          oneOf: [
+            {
+              properties: {
+                type: { const: "topic" }
+              },
+              required: ["type", "title"]
+            },
+            {
+              properties: {
+                type: { const: "source" }
+              },
+              required: ["type", "title"]
+            },
+            {
+              properties: {
+                type: { const: "claim" }
+              },
+              required: ["type", "title"]
+            },
+            {
+              properties: {
+                type: { const: "outline" },
+                stage: { type: "string", enum: ["seed", "working", "ready"] }
+              },
+              required: ["type", "title", "topicId"]
+            },
+            {
+              properties: {
+                type: { const: "draft" },
+                stage: { type: "string", enum: ["zero-draft", "revision", "polish"] }
+              },
+              required: ["type", "title", "topicId", "outlineId"]
+            }
+          ]
+        }
+      },
+      {
+        name: "oww.create_claim_note",
+        description: "Create and persist a claim note in the writable claims folder by default.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            title: {
+              type: "string"
+            },
+            statement: {
+              type: "string"
+            },
+            topicIds: {
+              type: "array",
+              items: {
+                type: "string"
+              }
+            },
+            sourceIds: {
+              type: "array",
+              items: {
+                type: "string"
+              }
+            },
+            stance: {
+              type: "string",
+              enum: ["supporting", "counter", "open-question"]
+            },
+            confidence: {
+              type: "number"
+            },
+            id: {
+              type: "string"
+            },
+            path: {
+              type: "string"
+            },
+            status: {
+              type: "string",
+              enum: ["seed", "active", "review", "done"]
+            },
+            tags: {
+              type: "array",
+              items: {
+                type: "string"
+              }
+            },
+            body: {
+              type: "string"
+            }
+          },
+          required: ["title", "statement", "topicIds"]
+        }
+      },
+      {
         name: "oww.upsert_note",
         description: "Create or update a note in a writable vault folder.",
         inputSchema: {
@@ -139,6 +382,38 @@ async function main() {
           const args = readNoteArgsSchema.parse(request.params.arguments ?? {});
           const result = await vaultAdapter.readValidatedNote(args.path);
           return asTextResult(result);
+        }
+
+        case "oww.validate_note": {
+          const args = upsertNoteArgsSchema.parse(request.params.arguments ?? {});
+          const result = validateNoteDocument(args);
+          return asTextResult({
+            valid: true,
+            note: result
+          });
+        }
+
+        case "oww.create_note_from_template": {
+          const write = createTemplateCommandSchema.parse(request.params.arguments ?? {}).write ?? false;
+          const args = createNoteFromTemplateInputSchema.parse(request.params.arguments ?? {});
+          const note = createNoteFromTemplate(args);
+          const result = write
+            ? {
+                note: await vaultAdapter.upsertNote(note),
+                persisted: true
+              }
+            : {
+                note,
+                persisted: false
+              };
+          return asTextResult(result);
+        }
+
+        case "oww.create_claim_note": {
+          const args = createClaimNoteInputSchema.parse(request.params.arguments ?? {});
+          const note = createClaimNote(args);
+          const result = await vaultAdapter.upsertNote(note);
+          return asTextResult({ note: result });
         }
 
         case "oww.upsert_note": {
