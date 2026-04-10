@@ -44,14 +44,14 @@ Status values used here:
 - `done` Add template note creation route.
 - `done` Add claim creation route.
 - `done` Add source, outline, and draft creation routes.
-- `next` Add vault status and diagnostics routes.
+- `done` Add vault status and diagnostics routes.
 - `next` Add clearer error payloads for skipped or invalid notes.
 
 ## 5. MCP surface
 
 - `done` Add list, read, validate, template-create, claim-create, upsert, and policy tools.
 - `done` Add source, outline, and draft creation tools.
-- `next` Add vault diagnostics and status tools.
+- `done` Add vault diagnostics and status tools.
 - `later` Add remote transport once auth and deployment rules are defined.
 
 ## 6. Retrieval and worker

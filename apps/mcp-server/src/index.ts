@@ -484,7 +484,7 @@ async function main() {
           const note = createNoteFromTemplate(args);
           const result = write
             ? {
-                note: await vaultAdapter.upsertNote(note),
+                note: await vaultAdapter.createNote(note),
                 persisted: true
               }
             : {
@@ -497,28 +497,28 @@ async function main() {
         case "oww.create_claim_note": {
           const args = createClaimNoteInputSchema.parse(request.params.arguments ?? {});
           const note = createClaimNote(args);
-          const result = await vaultAdapter.upsertNote(note);
+          const result = await vaultAdapter.createNote(note);
           return asTextResult({ note: result });
         }
 
         case "oww.create_source_note": {
           const args = createSourceNoteInputSchema.parse(request.params.arguments ?? {});
           const note = createSourceNote(args);
-          const result = await vaultAdapter.upsertNote(note);
+          const result = await vaultAdapter.createNote(note);
           return asTextResult({ note: result });
         }
 
         case "oww.create_outline_note": {
           const args = createOutlineNoteInputSchema.parse(request.params.arguments ?? {});
           const note = createOutlineNote(args);
-          const result = await vaultAdapter.upsertNote(note);
+          const result = await vaultAdapter.createNote(note);
           return asTextResult({ note: result });
         }
 
         case "oww.create_draft_note": {
           const args = createDraftNoteInputSchema.parse(request.params.arguments ?? {});
           const note = createDraftNote(args);
-          const result = await vaultAdapter.upsertNote(note);
+          const result = await vaultAdapter.createNote(note);
           return asTextResult({ note: result });
         }
 

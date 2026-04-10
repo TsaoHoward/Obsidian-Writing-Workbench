@@ -108,7 +108,54 @@ export class VaultAdapter {
     }
   }
 
-  // TODO: Add explicit create-only and update-only modes once note identity rules are finalized.
+  /**
+   * Create a new note. Throws if a file already exists at the resolved path.
+   */
+  async createNote(note: AnyNoteDocument): Promise<AnyNoteDocument> {
+    const validatedNote = validateNoteDocument(note);
+    const safeRelativePath = assertWritableVaultPath(validatedNote.path, this.policy);
+    const { absolutePath } = resolveVaultPath(this.vaultRoot, safeRelativePath);
+
+    let exists = false;
+    try {
+      await fs.access(absolutePath);
+      exists = true;
+    } catch {
+      // file does not exist — proceed
+    }
+
+    if (exists) {
+      throw new WorkbenchError("Note already exists at this path. Use updateNote to overwrite.", "NOTE_ALREADY_EXISTS", {
+        relativePath: safeRelativePath
+      });
+    }
+
+    return this.writeValidatedNote(note);
+  }
+
+  /**
+   * Update an existing note. Throws if no file exists at the resolved path.
+   */
+  async updateNote(note: AnyNoteDocument): Promise<AnyNoteDocument> {
+    const validatedNote = validateNoteDocument(note);
+    const safeRelativePath = assertWritableVaultPath(validatedNote.path, this.policy);
+    const { absolutePath } = resolveVaultPath(this.vaultRoot, safeRelativePath);
+
+    try {
+      await fs.access(absolutePath);
+    } catch {
+      throw new WorkbenchError("Note does not exist at this path. Use createNote to create it.", "NOTE_NOT_FOUND", {
+        relativePath: safeRelativePath
+      });
+    }
+
+    return this.writeValidatedNote(note);
+  }
+
+  /**
+   * Create or overwrite a note regardless of whether it exists.
+   * Prefer createNote or updateNote for explicit intent.
+   */
   async upsertNote(note: AnyNoteDocument): Promise<AnyNoteDocument> {
     return this.writeValidatedNote(note);
   }
