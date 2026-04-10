@@ -127,4 +127,9 @@ Verified on 2026-04-10:
 
 1. Improve retrieval quality with ranking, indexing, and related-note traversal.
 2. Strengthen workflow diagnostics around missing links, drift, and note health.
-3. Prepare remote-ready hardening: auth, tracing, and rate-limits before any non-local deployment.
+3. Preserve the backend-first, MCP-first architecture with clear seams for future remote hardening (auth, tracing, rate-limits, sync adapters).
+
+## V2 planning docs
+
+- Scope: [docs/v2-scope.md](./docs/v2-scope.md)
+- Work breakdown: [docs/wbs-v2.md](./docs/wbs-v2.md)
