@@ -1,9 +1,11 @@
-import { type AnyNoteDocument, type NoteKind, type NoteSummary, noteKinds } from "@oww/core";
+import { WorkbenchError, type AnyNoteDocument, type NoteKind, type NoteSummary, noteKinds } from "@oww/core";
 import { toNoteSummary } from "@oww/note-schema";
 import { VaultAdapter } from "@oww/vault-adapter";
 
 export interface SkippedNote {
   path: string;
+  /** Machine-readable error code (e.g. NOTE_VALIDATION_ERROR, VAULT_PATH_ERROR, UNKNOWN_ERROR). */
+  code: string;
   reason: string;
 }
 
@@ -57,6 +59,7 @@ export class SearchService {
       } catch (error) {
         skipped.push({
           path: notePath,
+          code: error instanceof WorkbenchError ? error.code : "UNKNOWN_ERROR",
           reason: error instanceof Error ? error.message : "Unknown validation error"
         });
       }
