@@ -32,6 +32,7 @@ packages/
   vault-adapter/ Safe vault scanning, parsing, and write enforcement
   search/       Minimal scan-based note listing and text search
 examples/
+  flows/        Runnable end-to-end examples for creation and retrieval workflows
   templates/    Example Markdown note templates for each note type
 ```
 
@@ -119,6 +120,17 @@ API_PORT=3000
 WORKER_RUN_MODE=watch
 WORKER_INDEX_PATH=./sandbox/dev-vault/.oww-index.json
 ```
+
+## Example flows
+
+Run the end-to-end examples from the repo root:
+
+```bash
+node --import tsx/esm examples/flows/topic-to-draft.ts
+node --import tsx/esm examples/flows/topic-to-related.ts
+```
+
+These examples walk through creation, retrieval, and diagnostics without requiring a separate server process.
 
 ## Local dev vault
 

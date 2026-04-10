@@ -12,7 +12,7 @@
  * and prints the resulting note paths and IDs.
  */
 
-import { mkdir, mkdtemp, rm } from "node:fs/promises";
+import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { buildServer } from "../../apps/api-server/src/server.js";
@@ -41,20 +41,39 @@ async function run() {
   try {
     console.log("=== Obsidian Writing Workbench: topic → draft flow ===\n");
 
-    // ── Step 1: Create a topic note ──────────────────────────────────────────
+    // ── Step 1: Seed a readable topic note, then read it through the API ─────
+    const topicPath = "01 Topics/topic-portable-ai-writing-backend.md";
+    await writeFile(
+      path.join(vaultRoot, topicPath),
+      `---
+id: topic-portable-ai-writing-backend
+type: topic
+title: Portable AI Writing Backend
+status: active
+tags:
+  - backend
+  - mcp
+createdAt: 2026-04-10T00:00:00Z
+updatedAt: 2026-04-10T00:00:00Z
+question: How should a portable AI-assisted writing backend for an Obsidian vault be designed?
+scope: Backend architecture, safety boundaries, and MCP compatibility.
+sourceIds: []
+claimIds: []
+outlineIds: []
+draftIds: []
+---
+
+Seeded topic body.
+`,
+      "utf8"
+    );
+
     const topicRes = await app.inject({
-      method: "POST",
-      url: "/notes/template",
-      payload: {
-        type: "topic",
-        title: "Portable AI Writing Backend",
-        question: "How should a portable AI-assisted writing backend for an Obsidian vault be designed?",
-        scope: "Backend architecture, safety boundaries, and MCP compatibility.",
-        write: true
-      }
+      method: "GET",
+      url: `/note?path=${encodeURIComponent(topicPath)}`
     });
     const { note: topic } = topicRes.json();
-    console.log(`[1/5] Topic created`);
+    console.log(`[1/5] Topic seeded and read`);
     console.log(`      path: ${topic.path}`);
     console.log(`      id:   ${topic.frontmatter.id}\n`);
 
