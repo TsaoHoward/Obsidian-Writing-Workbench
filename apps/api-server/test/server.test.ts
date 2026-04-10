@@ -46,6 +46,27 @@ Body text.
     "utf8"
   );
 
+  await writeFile(
+    path.join(vaultRoot, "02 Sources/existing-source.md"),
+    `---
+id: source-existing-source
+type: source
+title: Existing source
+status: seed
+tags: []
+createdAt: 2026-04-09T00:00:00Z
+updatedAt: 2026-04-09T00:00:00Z
+sourceKind: website
+authors: []
+topicIds: [topic-test]
+claimIds: []
+---
+
+Existing body.
+`,
+    "utf8"
+  );
+
   return vaultRoot;
 }
 
@@ -64,7 +85,7 @@ describe("API server", () => {
         url: "/notes"
       });
       expect(notesResponse.statusCode).toBe(200);
-      expect(notesResponse.json().notes).toHaveLength(1);
+      expect(notesResponse.json().notes).toHaveLength(2);
       expect(notesResponse.json().skipped).toHaveLength(0);
 
       const noteResponse = await app.inject({
@@ -78,26 +99,26 @@ describe("API server", () => {
         method: "PUT",
         url: "/note",
         payload: {
-          path: "00 Inbox/AI/test-draft.md",
+          path: "02 Sources/existing-source.md",
           frontmatter: {
-            id: "draft-test",
-            type: "draft",
-            title: "Draft test",
-            status: "seed",
-            tags: ["test"],
+            id: "source-existing-source",
+            type: "source",
+            title: "Existing source updated",
+            status: "active",
+            tags: [],
             createdAt: "2026-04-09T00:00:00Z",
-            updatedAt: "2026-04-09T00:00:00Z",
-            topicId: "topic-test",
-            claimIds: [],
-            sourceIds: [],
-            stage: "zero-draft"
+            updatedAt: "2026-04-10T00:00:00Z",
+            sourceKind: "website",
+            authors: [],
+            topicIds: ["topic-test"],
+            claimIds: []
           },
-          body: "Draft body."
+          body: "Updated body."
         }
       });
       expect(allowedWriteResponse.statusCode).toBe(200);
-      await expect(readFile(path.join(vaultRoot, "00 Inbox/AI/test-draft.md"), "utf8")).resolves.toContain(
-        "Draft test"
+      await expect(readFile(path.join(vaultRoot, "02 Sources/existing-source.md"), "utf8")).resolves.toContain(
+        "Existing source updated"
       );
 
       const blockedWriteResponse = await app.inject({
@@ -208,6 +229,79 @@ describe("API server", () => {
       await expect(
         readFile(path.join(vaultRoot, "03 Claims/claim-canonical-vaults-improve-portability.md"), "utf8")
       ).resolves.toContain("portable across clients");
+    } finally {
+      await app.close();
+      await rm(vaultRoot, { recursive: true, force: true });
+    }
+  });
+
+  it("creates source, outline, and draft notes and returns vault status", async () => {
+    const vaultRoot = await createTestVault();
+    const app = buildServer({
+      vaultRoot,
+      host: "127.0.0.1",
+      port: 3000
+    });
+
+    try {
+      const sourceResponse = await app.inject({
+        method: "POST",
+        url: "/sources",
+        payload: {
+          title: "MCP Overview",
+          topicIds: ["topic-test"],
+          sourceKind: "article",
+          authors: ["Author One"],
+          url: "https://example.com/mcp-overview"
+        }
+      });
+      expect(sourceResponse.statusCode).toBe(201);
+      expect(sourceResponse.json().note.frontmatter.type).toBe("source");
+
+      const outlineResponse = await app.inject({
+        method: "POST",
+        url: "/outlines",
+        payload: {
+          title: "Backend architecture outline",
+          topicId: "topic-test",
+          stage: "seed"
+        }
+      });
+      expect(outlineResponse.statusCode).toBe(201);
+      expect(outlineResponse.json().note.frontmatter.type).toBe("outline");
+
+      const draftResponse = await app.inject({
+        method: "POST",
+        url: "/drafts",
+        payload: {
+          title: "Backend architecture draft",
+          topicId: "topic-test",
+          stage: "zero-draft"
+        }
+      });
+      expect(draftResponse.statusCode).toBe(201);
+      expect(draftResponse.json().note.frontmatter.type).toBe("draft");
+
+      const statusResponse = await app.inject({
+        method: "GET",
+        url: "/vault/status"
+      });
+      expect(statusResponse.statusCode).toBe(200);
+      const status = statusResponse.json();
+      expect(status.totalNotes).toBe(5); // 1 topic seed + 1 pre-seeded source + 1 new source + 1 outline + 1 draft
+      expect(status.skipped).toHaveLength(0);
+      expect(status.byKind.find((k: { kind: string }) => k.kind === "topic")?.count).toBe(1);
+      expect(status.byKind.find((k: { kind: string }) => k.kind === "source")?.count).toBe(2);
+      expect(status.byKind.find((k: { kind: string }) => k.kind === "outline")?.count).toBe(1);
+      expect(status.byKind.find((k: { kind: string }) => k.kind === "draft")?.count).toBe(1);
+
+      const invalidResponse = await app.inject({
+        method: "GET",
+        url: "/vault/invalid"
+      });
+      expect(invalidResponse.statusCode).toBe(200);
+      expect(invalidResponse.json().count).toBe(0);
+      expect(invalidResponse.json().notes).toHaveLength(0);
     } finally {
       await app.close();
       await rm(vaultRoot, { recursive: true, force: true });

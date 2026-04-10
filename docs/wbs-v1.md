@@ -15,16 +15,16 @@ Status values used here:
 - `done` Define product intent and backend-first strategy.
 - `done` Define current architecture and package boundaries.
 - `done` Publish roadmap, v1 scope, and WBS documents.
-- `next` Define explicit v1 release criteria in one checklist that can gate release readiness.
+- `done` Define explicit v1 release criteria in one checklist that can gate release readiness.
 
 ## 2. Domain and safety
 
 - `done` Define core note types and shared schemas.
 - `done` Define readable, writable, and protected folder policy.
 - `done` Enforce vault-root and relative-path guards.
-- `active` Support safe shared note factories.
-- `next` Finalize note ID and filename strategy.
-- `next` Split write behavior into clearer create-only and update-only operations.
+- `done` Support safe shared note factories.
+- `done` Finalize note ID and filename strategy.
+- `done` Split write behavior into clearer create-only and update-only operations.
 - `deferred` Add destructive operations only behind explicit design and safety review.
 
 ## 3. Note creation workflows
@@ -32,10 +32,10 @@ Status values used here:
 - `done` Validate arbitrary note documents before write.
 - `done` Add template-driven note generation.
 - `done` Add claim-note creation helper.
-- `next` Add source-note creation helper.
-- `next` Add outline-note creation helper.
-- `next` Add draft-note creation helper.
-- `next` Define how cross-note links should be created or maintained.
+- `done` Add source-note creation helper.
+- `done` Add outline-note creation helper.
+- `done` Add draft-note creation helper.
+- `done` Define how cross-note links should be created or maintained.
 
 ## 4. API surface
 
@@ -43,21 +43,22 @@ Status values used here:
 - `done` Add note validation route.
 - `done` Add template note creation route.
 - `done` Add claim creation route.
-- `next` Add vault status and diagnostics routes.
-- `next` Add clearer error payloads for skipped or invalid notes.
+- `done` Add source, outline, and draft creation routes.
+
+- `done` Add clearer error payloads for skipped or invalid notes.
 
 ## 5. MCP surface
 
 - `done` Add list, read, validate, template-create, claim-create, upsert, and policy tools.
-- `next` Add source, outline, and draft creation tools.
-- `next` Add vault diagnostics and status tools.
+- `done` Add source, outline, and draft creation tools.
+- `done` Add vault diagnostics and status tools.
 - `later` Add remote transport once auth and deployment rules are defined.
 
 ## 6. Retrieval and worker
 
 - `done` Add scan-based search and note listing.
-- `next` Add invalid-note reporting and vault health summaries.
-- `next` Add worker-backed index refresh hooks.
+- `done` Add invalid-note reporting and vault health summaries.
+- `done` Add worker-backed index refresh hooks.
 - `later` Add richer ranking and graph traversal.
 - `later` Add semantic retrieval only if the simpler model proves insufficient.
 
@@ -67,17 +68,17 @@ Status values used here:
 - `done` Add schema normalization tests.
 - `done` Add note factory tests.
 - `done` Add API integration tests.
-- `next` Add MCP integration tests.
-- `next` Add regression tests around path and ID generation.
-- `next` Add repeatable dev-vault smoke checks.
+- `done` Add MCP integration tests.
+- `done` Add regression tests around path and ID generation.
+- `done` Add repeatable dev-vault smoke checks.
 
 ## 8. Documentation and developer UX
 
 - `done` Add README with architecture and safety rules.
 - `done` Add local dev vault guidance.
 - `done` Add planning documents.
-- `next` Add contribution and testing guide.
-- `next` Add examples showing expected note creation flows end to end.
+- `done` Add contribution and testing guide.
+- `done` Add examples showing expected note creation flows end to end.
 
 ## Suggested delivery order
 

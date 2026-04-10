@@ -1,9 +1,11 @@
-import { type AnyNoteDocument, type NoteKind, type NoteSummary } from "@oww/core";
+import { WorkbenchError, type AnyNoteDocument, type NoteKind, type NoteSummary, noteKinds } from "@oww/core";
 import { toNoteSummary } from "@oww/note-schema";
 import { VaultAdapter } from "@oww/vault-adapter";
 
 export interface SkippedNote {
   path: string;
+  /** Machine-readable error code (e.g. NOTE_VALIDATION_ERROR, VAULT_PATH_ERROR, UNKNOWN_ERROR). */
+  code: string;
   reason: string;
 }
 
@@ -31,6 +33,24 @@ export interface SearchNotesResult {
   skipped: SkippedNote[];
 }
 
+export interface NoteKindCount {
+  kind: NoteKind;
+  count: number;
+}
+
+export interface VaultStatus {
+  totalNotes: number;
+  byKind: NoteKindCount[];
+  skipped: SkippedNote[];
+  checkedAt: string;
+}
+
+export interface InvalidNotesReport {
+  count: number;
+  notes: SkippedNote[];
+  checkedAt: string;
+}
+
 export class SearchService {
   constructor(private readonly vaultAdapter: VaultAdapter) {}
 
@@ -45,6 +65,7 @@ export class SearchService {
       } catch (error) {
         skipped.push({
           path: notePath,
+          code: error instanceof WorkbenchError ? error.code : "UNKNOWN_ERROR",
           reason: error instanceof Error ? error.message : "Unknown validation error"
         });
       }
@@ -90,6 +111,35 @@ export class SearchService {
       }));
 
     return { hits, skipped };
+  }
+
+  async getVaultStatus(): Promise<VaultStatus> {
+    const { notes, skipped } = await this.loadValidatedNotes();
+
+    const counts = new Map<NoteKind, number>();
+    for (const kind of noteKinds) {
+      counts.set(kind, 0);
+    }
+    for (const note of notes) {
+      const kind = note.frontmatter.type;
+      counts.set(kind, (counts.get(kind) ?? 0) + 1);
+    }
+
+    return {
+      totalNotes: notes.length,
+      byKind: noteKinds.map((kind) => ({ kind, count: counts.get(kind) ?? 0 })),
+      skipped,
+      checkedAt: new Date().toISOString()
+    };
+  }
+
+  async getInvalidNotes(): Promise<InvalidNotesReport> {
+    const { skipped } = await this.loadValidatedNotes();
+    return {
+      count: skipped.length,
+      notes: skipped,
+      checkedAt: new Date().toISOString()
+    };
   }
 }
 

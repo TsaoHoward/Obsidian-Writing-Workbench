@@ -1,27 +1,39 @@
 import { config as loadDotenv } from "dotenv";
+import { writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { SearchService } from "@oww/search";
 import { VaultAdapter } from "@oww/vault-adapter";
 import { loadWorkerConfig } from "./config.js";
+import { type WorkerConfig } from "./config.js";
 
 loadDotenv({
   path: fileURLToPath(new URL("../../../.env", import.meta.url))
 });
 
-async function runPass(searchService: SearchService): Promise<void> {
-  const { notes, skipped } = await searchService.listNotes();
+async function runPass(searchService: SearchService, config: WorkerConfig): Promise<void> {
+  const [status, invalid] = await Promise.all([
+    searchService.getVaultStatus(),
+    searchService.getInvalidNotes()
+  ]);
 
-  console.log(
-    JSON.stringify(
-      {
-        event: "worker.pass.completed",
-        noteCount: notes.length,
-        skippedCount: skipped.length
-      },
-      null,
-      2
-    )
-  );
+  const summary = {
+    event: "worker.pass.completed",
+    totalNotes: status.totalNotes,
+    byKind: status.byKind,
+    invalidCount: invalid.count,
+    skipped: invalid.notes,
+    indexedAt: status.checkedAt
+  };
+
+  console.log(JSON.stringify(summary, null, 2));
+
+  if (config.indexPath) {
+    try {
+      await writeFile(config.indexPath, JSON.stringify(summary, null, 2), "utf8");
+    } catch (error) {
+      console.error("Worker: failed to write index file.", error);
+    }
+  }
 }
 
 async function main() {
@@ -31,10 +43,10 @@ async function main() {
   });
   const searchService = new SearchService(vaultAdapter);
 
-  await runPass(searchService);
+  await runPass(searchService, config);
 
   setInterval(() => {
-    void runPass(searchService);
+    void runPass(searchService, config);
   }, config.pollMs);
 
   // TODO: Replace polling with explicit indexing jobs and queue-backed work orchestration.
@@ -44,3 +56,4 @@ main().catch((error) => {
   console.error("Worker failed to start.", error);
   process.exitCode = 1;
 });
+

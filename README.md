@@ -6,7 +6,9 @@ Portable AI-assisted writing infrastructure for an Obsidian vault. The vault sta
 
 - See [ROADMAP.md](./ROADMAP.md) for goals, direction, milestones, and the current delivery order.
 - See [docs/v1-scope.md](./docs/v1-scope.md) for the intended v1 boundary and explicit deferred items.
+- See [docs/v1-checklist.md](./docs/v1-checklist.md) for the release-gating checklist.
 - See [docs/wbs-v1.md](./docs/wbs-v1.md) for the lightweight work breakdown structure.
+- See [CONTRIBUTING.md](./CONTRIBUTING.md) for the local dev loop and testing guide.
 
 ## Purpose
 
@@ -126,11 +128,16 @@ API_PORT=3000
 
 - `GET /health`
 - `GET /policies`
-- `GET /notes`
-- `GET /note?path=04 Outlines/example.md`
+- `GET /notes` — list or search readable notes (`?type=`, `?query=`, `?limit=`)
+- `GET /note?path=...`
+- `GET /vault/status` — note counts by kind + skipped list
+- `GET /vault/invalid` — structured list of notes that failed validation
 - `POST /notes/validate`
 - `POST /notes/template`
 - `POST /claims`
+- `POST /sources`
+- `POST /outlines`
+- `POST /drafts`
 - `PUT /note`
 
 ### MCP tools
@@ -140,8 +147,13 @@ API_PORT=3000
 - `oww.validate_note`
 - `oww.create_note_from_template`
 - `oww.create_claim_note`
+- `oww.create_source_note`
+- `oww.create_outline_note`
+- `oww.create_draft_note`
 - `oww.upsert_note`
 - `oww.get_policy`
+- `oww.get_vault_status`
+- `oww.get_invalid_notes`
 
 ## Roadmap
 
