@@ -183,4 +183,45 @@ Orphan body.
       await rm(vaultRoot, { recursive: true, force: true });
     }
   });
+
+  it("reuses cached notes until refreshIndex is called", async () => {
+    const vaultRoot = await createTestVault();
+    const service = new SearchService(new VaultAdapter({ vaultRoot }));
+
+    try {
+      const first = await service.listNotes();
+      expect(first.notes).toHaveLength(3);
+
+      await writeFile(
+        path.join(vaultRoot, "03 Claims/cached-claim.md"),
+        `---
+id: claim-cached-note
+type: claim
+title: Cached note
+status: active
+tags: []
+createdAt: 2026-04-09T00:00:00Z
+updatedAt: 2026-04-09T00:00:00Z
+statement: Newly added notes should wait for explicit refresh.
+stance: supporting
+topicIds: [topic-test]
+sourceIds: [source-alpha]
+confidence: 0.9
+---
+
+Cached body.
+`,
+        "utf8"
+      );
+
+      const cached = await service.listNotes();
+      expect(cached.notes).toHaveLength(3);
+
+      await service.refreshIndex();
+      const refreshed = await service.listNotes();
+      expect(refreshed.notes).toHaveLength(4);
+    } finally {
+      await rm(vaultRoot, { recursive: true, force: true });
+    }
+  });
 });

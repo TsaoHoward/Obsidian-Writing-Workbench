@@ -12,6 +12,11 @@ export interface SkippedNote {
 export interface LoadNotesResult {
   notes: AnyNoteDocument[];
   skipped: SkippedNote[];
+  checkedAt: string;
+}
+
+export interface SearchServiceOptions {
+  cacheEnabled?: boolean;
 }
 
 export interface ListNotesOptions {
@@ -110,9 +115,36 @@ interface RelatedAccumulator {
 }
 
 export class SearchService {
-  constructor(private readonly vaultAdapter: VaultAdapter) {}
+  private cachedLoadResult: LoadNotesResult | undefined;
+
+  constructor(
+    private readonly vaultAdapter: VaultAdapter,
+    private readonly options: SearchServiceOptions = {}
+  ) {}
+
+  invalidateCache(): void {
+    this.cachedLoadResult = undefined;
+  }
+
+  async refreshIndex(): Promise<LoadNotesResult> {
+    const fresh = await this.scanValidatedNotes();
+
+    if (this.options.cacheEnabled !== false) {
+      this.cachedLoadResult = fresh;
+    }
+
+    return fresh;
+  }
 
   async loadValidatedNotes(): Promise<LoadNotesResult> {
+    if (this.options.cacheEnabled !== false && this.cachedLoadResult) {
+      return this.cachedLoadResult;
+    }
+
+    return this.refreshIndex();
+  }
+
+  private async scanValidatedNotes(): Promise<LoadNotesResult> {
     const paths = await this.vaultAdapter.listReadableMarkdownFiles();
     const notes: AnyNoteDocument[] = [];
     const skipped: SkippedNote[] = [];
@@ -129,7 +161,11 @@ export class SearchService {
       }
     }
 
-    return { notes, skipped };
+    return {
+      notes,
+      skipped,
+      checkedAt: new Date().toISOString()
+    };
   }
 
   async listNotes(options: ListNotesOptions = {}): Promise<{ notes: NoteSummary[]; skipped: SkippedNote[] }> {
@@ -173,7 +209,7 @@ export class SearchService {
   }
 
   async getRelatedNotes(options: GetRelatedNotesOptions): Promise<RelatedNotesResult> {
-    const { notes, skipped } = await this.loadValidatedNotes();
+    const { notes, skipped, checkedAt } = await this.loadValidatedNotes();
     const seed = resolveRequestedNote(notes, options);
     const noteById = new Map(notes.map((note) => [note.frontmatter.id, note]));
     const related = new Map<string, RelatedAccumulator>();
@@ -237,12 +273,12 @@ export class SearchService {
         })),
       missingIds: Array.from(missingIds).sort(),
       skipped,
-      checkedAt: new Date().toISOString()
+      checkedAt
     };
   }
 
   async getVaultDiagnostics(): Promise<VaultDiagnosticsReport> {
-    const { notes, skipped } = await this.loadValidatedNotes();
+    const { notes, skipped, checkedAt } = await this.loadValidatedNotes();
     const noteById = new Map(notes.map((note) => [note.frontmatter.id, note]));
     const inboundRefs = new Map<string, Set<string>>();
     const missingByNote = new Map<string, { note: AnyNoteDocument; ids: Set<string> }>();
@@ -307,12 +343,12 @@ export class SearchService {
       },
       issues,
       skipped,
-      checkedAt: new Date().toISOString()
+      checkedAt
     };
   }
 
   async getVaultStatus(): Promise<VaultStatus> {
-    const { notes, skipped } = await this.loadValidatedNotes();
+    const { notes, skipped, checkedAt } = await this.loadValidatedNotes();
 
     const counts = new Map<NoteKind, number>();
     for (const kind of noteKinds) {
@@ -327,16 +363,16 @@ export class SearchService {
       totalNotes: notes.length,
       byKind: noteKinds.map((kind) => ({ kind, count: counts.get(kind) ?? 0 })),
       skipped,
-      checkedAt: new Date().toISOString()
+      checkedAt
     };
   }
 
   async getInvalidNotes(): Promise<InvalidNotesReport> {
-    const { skipped } = await this.loadValidatedNotes();
+    const { skipped, checkedAt } = await this.loadValidatedNotes();
     return {
       count: skipped.length,
       notes: skipped,
-      checkedAt: new Date().toISOString()
+      checkedAt
     };
   }
 }

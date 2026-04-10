@@ -141,6 +141,7 @@ export function buildServer(config: ApiServerConfig) {
     }
 
     const savedNote = await vaultAdapter.createNote(note);
+    searchService.invalidateCache();
     reply.code(201);
     return {
       note: savedNote,
@@ -152,6 +153,7 @@ export function buildServer(config: ApiServerConfig) {
     const body = createClaimNoteInputSchema.parse(request.body);
     const note = createClaimNote(body);
     const savedNote = await vaultAdapter.createNote(note);
+    searchService.invalidateCache();
 
     reply.code(201);
     return { note: savedNote };
@@ -161,6 +163,7 @@ export function buildServer(config: ApiServerConfig) {
     const body = createSourceNoteInputSchema.parse(request.body);
     const note = createSourceNote(body);
     const savedNote = await vaultAdapter.createNote(note);
+    searchService.invalidateCache();
 
     reply.code(201);
     return { note: savedNote };
@@ -170,6 +173,7 @@ export function buildServer(config: ApiServerConfig) {
     const body = createOutlineNoteInputSchema.parse(request.body);
     const note = createOutlineNote(body);
     const savedNote = await vaultAdapter.createNote(note);
+    searchService.invalidateCache();
 
     reply.code(201);
     return { note: savedNote };
@@ -179,6 +183,7 @@ export function buildServer(config: ApiServerConfig) {
     const body = createDraftNoteInputSchema.parse(request.body);
     const note = createDraftNote(body);
     const savedNote = await vaultAdapter.createNote(note);
+    searchService.invalidateCache();
 
     reply.code(201);
     return { note: savedNote };
@@ -188,6 +193,7 @@ export function buildServer(config: ApiServerConfig) {
     const body = upsertNoteBodySchema.parse(request.body);
     const note = validateNoteDocument(body);
     const savedNote = await vaultAdapter.updateNote(note);
+    searchService.invalidateCache();
 
     reply.code(200);
     return { note: savedNote };

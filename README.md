@@ -30,7 +30,7 @@ packages/
   core/         Domain types, folder policy, and shared errors
   note-schema/  Zod schemas and runtime validation for note contracts
   vault-adapter/ Safe vault scanning, parsing, and write enforcement
-  search/       Minimal scan-based note listing and text search
+  search/       In-memory-cached note listing, ranked search, and diagnostics
 examples/
   flows/        Runnable end-to-end examples for creation and retrieval workflows
   templates/    Example Markdown note templates for each note type
@@ -110,7 +110,7 @@ Protected folders are blocked from writes in v1. Destructive operations are inte
 4. Run the API with `pnpm dev:api`.
 5. Run the MCP server with `pnpm dev:mcp`.
 6. Run the worker in watch mode with `pnpm dev:worker`.
-7. Trigger a one-shot refresh/index pass with `pnpm refresh:worker`.
+7. Trigger a one-shot refresh/index pass with `pnpm refresh:worker` to warm the latest retrieval/diagnostics snapshot.
 
 Example environment:
 

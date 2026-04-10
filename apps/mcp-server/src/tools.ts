@@ -336,6 +336,9 @@ export async function dispatchTool(name: string, rawArgs: unknown, deps: ToolDep
         const result = write
           ? { note: await deps.vaultAdapter.createNote(note), persisted: true }
           : { note, persisted: false };
+        if (write) {
+          deps.searchService.invalidateCache();
+        }
         return asTextResult(result);
       }
 
@@ -343,6 +346,7 @@ export async function dispatchTool(name: string, rawArgs: unknown, deps: ToolDep
         const parsed = createClaimNoteInputSchema.parse(args);
         const note = createClaimNote(parsed);
         const result = await deps.vaultAdapter.createNote(note);
+        deps.searchService.invalidateCache();
         return asTextResult({ note: result });
       }
 
@@ -350,6 +354,7 @@ export async function dispatchTool(name: string, rawArgs: unknown, deps: ToolDep
         const parsed = createSourceNoteInputSchema.parse(args);
         const note = createSourceNote(parsed);
         const result = await deps.vaultAdapter.createNote(note);
+        deps.searchService.invalidateCache();
         return asTextResult({ note: result });
       }
 
@@ -357,6 +362,7 @@ export async function dispatchTool(name: string, rawArgs: unknown, deps: ToolDep
         const parsed = createOutlineNoteInputSchema.parse(args);
         const note = createOutlineNote(parsed);
         const result = await deps.vaultAdapter.createNote(note);
+        deps.searchService.invalidateCache();
         return asTextResult({ note: result });
       }
 
@@ -364,6 +370,7 @@ export async function dispatchTool(name: string, rawArgs: unknown, deps: ToolDep
         const parsed = createDraftNoteInputSchema.parse(args);
         const note = createDraftNote(parsed);
         const result = await deps.vaultAdapter.createNote(note);
+        deps.searchService.invalidateCache();
         return asTextResult({ note: result });
       }
 
@@ -371,6 +378,7 @@ export async function dispatchTool(name: string, rawArgs: unknown, deps: ToolDep
         const parsed = upsertNoteArgsSchema.parse(args);
         const note = validateNoteDocument(parsed);
         const result = await deps.vaultAdapter.upsertNote(note);
+        deps.searchService.invalidateCache();
         return asTextResult(result);
       }
 

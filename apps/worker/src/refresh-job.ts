@@ -26,6 +26,8 @@ export async function runRefreshJob(
   config: WorkerConfig,
   trigger: RefreshTrigger = "manual"
 ): Promise<WorkerRefreshResult> {
+  await searchService.refreshIndex();
+
   const [status, invalid, diagnostics] = await Promise.all([
     searchService.getVaultStatus(),
     searchService.getInvalidNotes(),
