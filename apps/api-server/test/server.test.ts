@@ -356,6 +356,51 @@ Claim body.
     }
   });
 
+  it("returns ranked note search hits with snippets", async () => {
+    const vaultRoot = await createTestVault();
+    const app = buildServer({
+      vaultRoot,
+      host: "127.0.0.1",
+      port: 3000
+    });
+
+    try {
+      await writeFile(
+        path.join(vaultRoot, "03 Claims/backend-claim.md"),
+        `---
+id: claim-backend-architecture
+type: claim
+title: Backend architecture claim
+status: active
+tags: [backend, retrieval]
+createdAt: 2026-04-09T00:00:00Z
+updatedAt: 2026-04-09T00:00:00Z
+statement: Backend architecture should preserve vault safety while improving retrieval quality.
+stance: supporting
+topicIds: [topic-test]
+sourceIds: [source-existing-source]
+confidence: 0.95
+---
+
+A backend architecture can expose better retrieval snippets without losing safety guarantees.
+`,
+        "utf8"
+      );
+
+      const searchResponse = await app.inject({
+        method: "GET",
+        url: "/notes?query=backend%20architecture"
+      });
+      expect(searchResponse.statusCode).toBe(200);
+      const payload = searchResponse.json();
+      expect(payload.hits[0].note.id).toBe("claim-backend-architecture");
+      expect(payload.hits[0].snippet).toContain("backend architecture");
+    } finally {
+      await app.close();
+      await rm(vaultRoot, { recursive: true, force: true });
+    }
+  });
+
   it("returns vault diagnostics with broken-link and orphan warnings", async () => {
     const vaultRoot = await createTestVault();
     const app = buildServer({

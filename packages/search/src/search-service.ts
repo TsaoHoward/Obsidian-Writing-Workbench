@@ -26,6 +26,7 @@ export interface SearchNotesOptions extends ListNotesOptions {
 export interface SearchHit {
   note: NoteSummary;
   score: number;
+  snippet: string;
 }
 
 export interface SearchNotesResult {
@@ -164,7 +165,8 @@ export class SearchService {
       .slice(0, options.limit ?? 20)
       .map((entry) => ({
         note: toNoteSummary(entry.note),
-        score: entry.score
+        score: entry.score,
+        snippet: buildSnippet(entry.note, normalizedQuery)
       }));
 
     return { hits, skipped };
@@ -434,6 +436,28 @@ function compareDiagnosticIssues(left: VaultDiagnosticIssue, right: VaultDiagnos
     left.code.localeCompare(right.code) ||
     left.noteId.localeCompare(right.noteId)
   );
+}
+
+function buildSnippet(note: AnyNoteDocument, normalizedQuery: string): string {
+  const candidates = [
+    note.frontmatter.title,
+    note.frontmatter.id,
+    note.body,
+    JSON.stringify(note.frontmatter)
+  ];
+
+  for (const candidate of candidates) {
+    const lowered = candidate.toLowerCase();
+    const index = lowered.indexOf(normalizedQuery);
+    if (index >= 0) {
+      const start = Math.max(0, index - 30);
+      const end = Math.min(candidate.length, index + normalizedQuery.length + 50);
+      return candidate.slice(start, end).replace(/\s+/g, " ").trim().toLowerCase();
+    }
+  }
+
+  const fallback = note.body.trim() || note.frontmatter.title;
+  return fallback.slice(0, 120).replace(/\s+/g, " ").trim();
 }
 
 function scoreNote(note: AnyNoteDocument, normalizedQuery: string): number {

@@ -133,7 +133,7 @@ WORKER_INDEX_PATH=./sandbox/dev-vault/.oww-index.json
 
 - `GET /health`
 - `GET /policies`
-- `GET /notes` — list or search readable notes (`?type=`, `?query=`, `?limit=`)
+- `GET /notes` — list or search readable notes (`?type=`, `?query=`, `?limit=`), with ranked hits and snippets when searching
 - `GET /note?path=...`
 - `GET /notes/related?id=...` — one-hop related-note traversal + missing linked IDs
 - `GET /vault/status` — note counts by kind + skipped list
