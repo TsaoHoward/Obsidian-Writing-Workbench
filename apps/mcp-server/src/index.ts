@@ -180,6 +180,12 @@ async function main() {
                 type: "string"
               }
             },
+            topicIds: {
+              type: "array",
+              items: {
+                type: "string"
+              }
+            },
             sourceKind: {
               type: "string",
               enum: ["article", "paper", "book", "podcast", "video", "website", "interview", "other"]
@@ -217,8 +223,7 @@ async function main() {
               type: "string"
             },
             stage: {
-              type: "string",
-              enum: ["seed", "working", "ready", "zero-draft", "revision", "polish"]
+              type: "string"
             },
             targetAudience: {
               type: "string"
@@ -233,7 +238,40 @@ async function main() {
               type: "number"
             }
           },
-          required: ["type", "title"]
+          oneOf: [
+            {
+              properties: {
+                type: { const: "topic" }
+              },
+              required: ["type", "title"]
+            },
+            {
+              properties: {
+                type: { const: "source" }
+              },
+              required: ["type", "title"]
+            },
+            {
+              properties: {
+                type: { const: "claim" }
+              },
+              required: ["type", "title"]
+            },
+            {
+              properties: {
+                type: { const: "outline" },
+                stage: { type: "string", enum: ["seed", "working", "ready"] }
+              },
+              required: ["type", "title", "topicId"]
+            },
+            {
+              properties: {
+                type: { const: "draft" },
+                stage: { type: "string", enum: ["zero-draft", "revision", "polish"] }
+              },
+              required: ["type", "title", "topicId", "outlineId"]
+            }
+          ]
         }
       },
       {
