@@ -23,8 +23,8 @@ Status values used here:
 - `done` Define readable, writable, and protected folder policy.
 - `done` Enforce vault-root and relative-path guards.
 - `done` Support safe shared note factories.
-- `next` Finalize note ID and filename strategy.
-- `next` Split write behavior into clearer create-only and update-only operations.
+- `done` Finalize note ID and filename strategy.
+- `done` Split write behavior into clearer create-only and update-only operations.
 - `deferred` Add destructive operations only behind explicit design and safety review.
 
 ## 3. Note creation workflows
@@ -44,7 +44,7 @@ Status values used here:
 - `done` Add template note creation route.
 - `done` Add claim creation route.
 - `done` Add source, outline, and draft creation routes.
-- `done` Add vault status and diagnostics routes.
+
 - `next` Add clearer error payloads for skipped or invalid notes.
 
 ## 5. MCP surface
