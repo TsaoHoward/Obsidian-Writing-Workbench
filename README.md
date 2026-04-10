@@ -2,6 +2,12 @@
 
 Portable AI-assisted writing infrastructure for an Obsidian vault. The vault stays the source of truth, while this repo provides a safe backend, shared note schemas, and an MCP-friendly tool layer for AI clients.
 
+## Planning docs
+
+- See [ROADMAP.md](./ROADMAP.md) for goals, direction, milestones, and the current delivery order.
+- See [docs/v1-scope.md](./docs/v1-scope.md) for the intended v1 boundary and explicit deferred items.
+- See [docs/wbs-v1.md](./docs/wbs-v1.md) for the lightweight work breakdown structure.
+
 ## Purpose
 
 - Support a short-essay workflow built around Markdown notes in an Obsidian vault.
@@ -141,10 +147,10 @@ API_PORT=3000
 
 ### Near-term
 
-- Add stable note creation helpers and stronger note ID conventions.
+- Add source, outline, and draft creation helpers.
+- Add stronger note ID and path conventions.
+- Add vault status and diagnostics.
 - Add better search ranking and note graph traversal.
-- Add index jobs in the worker.
-- Add test coverage around policy enforcement and schema validation.
 
 ### Later
 
@@ -152,6 +158,8 @@ API_PORT=3000
 - Richer research ingestion workflows.
 - Draft synthesis and revision pipelines.
 - Optional UI clients that stay thin and call the shared backend.
+
+See [ROADMAP.md](./ROADMAP.md) for milestone detail.
 
 ## Safety principles
 
