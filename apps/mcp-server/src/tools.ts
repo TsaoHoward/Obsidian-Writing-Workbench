@@ -46,7 +46,7 @@ export type ToolResult =
 
 export const toolDefinitions = [
   {
-    name: "oww_list_notes",
+    name: "list_notes",
     description: "List or search readable notes from the Obsidian writing vault.",
     inputSchema: {
       type: "object",
@@ -58,7 +58,7 @@ export const toolDefinitions = [
     }
   },
   {
-    name: "oww_read_note",
+    name: "read_note",
     description: "Read a validated note from the vault by relative path.",
     inputSchema: {
       type: "object",
@@ -67,7 +67,7 @@ export const toolDefinitions = [
     }
   },
   {
-    name: "oww_validate_note",
+    name: "validate_note",
     description: "Validate and normalize a note document without writing it to the vault.",
     inputSchema: {
       type: "object",
@@ -80,7 +80,7 @@ export const toolDefinitions = [
     }
   },
   {
-    name: "oww_create_note_from_template",
+    name: "create_note_from_template",
     description:
       "Generate a typed note from a built-in template and optionally persist it when the target folder is writable.",
     inputSchema: {
@@ -139,7 +139,7 @@ export const toolDefinitions = [
     }
   },
   {
-    name: "oww_create_claim_note",
+    name: "create_claim_note",
     description: "Create and persist a claim note in the writable claims folder by default.",
     inputSchema: {
       type: "object",
@@ -160,7 +160,7 @@ export const toolDefinitions = [
     }
   },
   {
-    name: "oww_create_source_note",
+    name: "create_source_note",
     description: "Create and persist a source note in the writable sources folder.",
     inputSchema: {
       type: "object",
@@ -187,7 +187,7 @@ export const toolDefinitions = [
     }
   },
   {
-    name: "oww_create_outline_note",
+    name: "create_outline_note",
     description: "Create and persist an outline note in the writable outlines folder.",
     inputSchema: {
       type: "object",
@@ -209,7 +209,7 @@ export const toolDefinitions = [
     }
   },
   {
-    name: "oww_create_draft_note",
+    name: "create_draft_note",
     description: "Create and persist a draft note in the writable drafts folder.",
     inputSchema: {
       type: "object",
@@ -231,7 +231,7 @@ export const toolDefinitions = [
     }
   },
   {
-    name: "oww_upsert_note",
+    name: "upsert_note",
     description: "Create or update a note in a writable vault folder.",
     inputSchema: {
       type: "object",
@@ -244,18 +244,18 @@ export const toolDefinitions = [
     }
   },
   {
-    name: "oww_get_policy",
+    name: "get_policy",
     description: "Return the active readable, writable, and protected folder policy.",
     inputSchema: { type: "object", properties: {} }
   },
   {
-    name: "oww_get_vault_status",
+    name: "get_vault_status",
     description:
       "Return a summary of all valid notes in the vault grouped by kind, plus any notes that failed validation.",
     inputSchema: { type: "object", properties: {} }
   },
   {
-    name: "oww_get_invalid_notes",
+    name: "get_invalid_notes",
     description:
       "Return all notes that failed validation, each with a machine-readable error code and reason.",
     inputSchema: { type: "object", properties: {} }
@@ -266,7 +266,7 @@ export async function dispatchTool(name: string, rawArgs: unknown, deps: ToolDep
   const args = rawArgs ?? {};
   try {
     switch (name) {
-      case "oww_list_notes": {
+      case "list_notes": {
         const parsed = listNotesArgsSchema.parse(args);
         const baseOptions = {
           ...(parsed.type ? { type: parsed.type } : {}),
@@ -279,19 +279,19 @@ export async function dispatchTool(name: string, rawArgs: unknown, deps: ToolDep
         return asTextResult(result);
       }
 
-      case "oww_read_note": {
+      case "read_note": {
         const parsed = readNoteArgsSchema.parse(args);
         const result = await deps.vaultAdapter.readValidatedNote(parsed.path);
         return asTextResult(result);
       }
 
-      case "oww_validate_note": {
+      case "validate_note": {
         const parsed = upsertNoteArgsSchema.parse(args);
         const result = validateNoteDocument(parsed);
         return asTextResult({ valid: true, note: result });
       }
 
-      case "oww_create_note_from_template": {
+      case "create_note_from_template": {
         const write = createTemplateCommandSchema.parse(args).write ?? false;
         const parsed = createNoteFromTemplateInputSchema.parse(args);
         const note = createNoteFromTemplate(parsed);
@@ -301,51 +301,51 @@ export async function dispatchTool(name: string, rawArgs: unknown, deps: ToolDep
         return asTextResult(result);
       }
 
-      case "oww_create_claim_note": {
+      case "create_claim_note": {
         const parsed = createClaimNoteInputSchema.parse(args);
         const note = createClaimNote(parsed);
         const result = await deps.vaultAdapter.createNote(note);
         return asTextResult({ note: result });
       }
 
-      case "oww_create_source_note": {
+      case "create_source_note": {
         const parsed = createSourceNoteInputSchema.parse(args);
         const note = createSourceNote(parsed);
         const result = await deps.vaultAdapter.createNote(note);
         return asTextResult({ note: result });
       }
 
-      case "oww_create_outline_note": {
+      case "create_outline_note": {
         const parsed = createOutlineNoteInputSchema.parse(args);
         const note = createOutlineNote(parsed);
         const result = await deps.vaultAdapter.createNote(note);
         return asTextResult({ note: result });
       }
 
-      case "oww_create_draft_note": {
+      case "create_draft_note": {
         const parsed = createDraftNoteInputSchema.parse(args);
         const note = createDraftNote(parsed);
         const result = await deps.vaultAdapter.createNote(note);
         return asTextResult({ note: result });
       }
 
-      case "oww_upsert_note": {
+      case "upsert_note": {
         const parsed = upsertNoteArgsSchema.parse(args);
         const note = validateNoteDocument(parsed);
         const result = await deps.vaultAdapter.upsertNote(note);
         return asTextResult(result);
       }
 
-      case "oww_get_policy": {
+      case "get_policy": {
         return asTextResult(deps.vaultAdapter.getPolicy());
       }
 
-      case "oww_get_vault_status": {
+      case "get_vault_status": {
         const result = await deps.searchService.getVaultStatus();
         return asTextResult(result);
       }
 
-      case "oww_get_invalid_notes": {
+      case "get_invalid_notes": {
         const result = await deps.searchService.getInvalidNotes();
         return asTextResult(result);
       }

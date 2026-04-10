@@ -1,0 +1,12 @@
+{
+  "servers": {
+    "oww": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["${workspaceFolder}/apps/mcp-server/dist/index.js"],
+      "env": {
+        "VAULT_ROOT": "${workspaceFolder}/sandbox/dev-vault"
+      }
+    }
+  }
+}
