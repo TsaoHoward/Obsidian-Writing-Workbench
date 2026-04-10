@@ -34,7 +34,7 @@ This checklist gates the v1 release. All items must be checked before tagging `v
 
 - [x] All API capabilities exposed as MCP tools via `dispatchTool`.
 - [x] `oww.get_invalid_notes` available for vault health inspection.
-- [ ] MCP server starts without error against the dev vault in a real Claude session.
+- [x] MCP server builds and starts without error against the dev vault in a real stdio launch (`VAULT_ROOT=./sandbox/dev-vault`).
 
 ## Verification
 
@@ -44,7 +44,15 @@ This checklist gates the v1 release. All items must be checked before tagging `v
 - [x] API integration tests pass (9 assertions across 3 test groups).
 - [x] MCP integration tests pass (12 assertions).
 - [x] Dev-vault smoke tests pass (`vitest run --config vitest.smoke.config.ts`).
-- [ ] No `console.warn` output from the smoke test for invalid dev-vault notes.
+- [x] No `console.warn` output from the smoke test for invalid dev-vault notes.
+
+### Acceptance record (2026-04-10)
+
+- `corepack pnpm build` ✅
+- `corepack pnpm typecheck` ✅
+- `corepack pnpm test` ✅ — 6 test files, 38 tests passed
+- `corepack pnpm vitest run --config vitest.smoke.config.ts` ✅ — 1 file, 7 tests passed
+- `VAULT_ROOT=./sandbox/dev-vault; corepack pnpm --filter @oww/mcp-server build` then `corepack pnpm --filter @oww/mcp-server start` ✅ — startup completed without error output
 
 ## Developer experience
 

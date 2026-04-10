@@ -44,7 +44,7 @@ Status: completed
 
 ### M1 Safe note operations
 
-Status: active
+Status: completed
 
 - Stabilize note creation helpers for all core note kinds.
 - Finalize ID and path generation rules.
@@ -59,7 +59,7 @@ Exit signal:
 
 ### M2 Core writing workflow
 
-Status: next
+Status: completed
 
 - Add `create_source_note`.
 - Add `create_outline_note`.
@@ -76,9 +76,9 @@ Exit signal:
 Status: next
 
 - Improve search ranking beyond scan-and-match.
-- Add worker-backed indexing hooks.
-- Add invalid-note reporting and drift detection.
+- Expand worker-backed indexing from scaffold hooks to durable refresh jobs.
 - Add graph-style traversal for related notes.
+- Surface richer workflow diagnostics for missing links and vault drift.
 
 Exit signal:
 
@@ -111,7 +111,9 @@ Constraint:
 
 ## V1 release target
 
-V1 is ready when the backend can safely support the core writing workflow for one local vault:
+The local v1 acceptance target is now met for a single-vault workflow.
+
+Verified on 2026-04-10:
 
 - Read and validate the five core note types.
 - Create source, claim, outline, and draft notes through shared helpers.
@@ -119,9 +121,10 @@ V1 is ready when the backend can safely support the core writing workflow for on
 - Expose the same behavior through API and MCP.
 - Provide enough diagnostics to understand vault health.
 - Keep destructive operations deferred.
+- Pass `build`, `typecheck`, unit/integration tests, and dev-vault smoke checks.
 
 ## Immediate next PRs
 
-1. Add source, outline, and draft creation helpers plus corresponding API and MCP tools.
-2. Add vault status and diagnostics views for readable, skipped, and protected-path behavior.
-3. Add stronger ID, path, and link maintenance rules.
+1. Improve retrieval quality with ranking, indexing, and related-note traversal.
+2. Strengthen workflow diagnostics around missing links, drift, and note health.
+3. Prepare remote-ready hardening: auth, tracing, and rate-limits before any non-local deployment.

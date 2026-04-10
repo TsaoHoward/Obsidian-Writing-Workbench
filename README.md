@@ -159,10 +159,10 @@ API_PORT=3000
 
 ### Near-term
 
-- Add source, outline, and draft creation helpers.
-- Add stronger note ID and path conventions.
-- Add vault status and diagnostics.
 - Add better search ranking and note graph traversal.
+- Expand worker-backed indexing beyond scan-on-request.
+- Strengthen diagnostics for missing links, skipped notes, and vault drift.
+- Prepare remote-ready hardening such as auth, tracing, and rate-limits.
 
 ### Later
 
