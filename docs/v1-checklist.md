@@ -15,7 +15,7 @@ This checklist gates the v1 release. All items must be checked before tagging `v
 
 - [x] `createNoteFromTemplate` generates all five note kinds with deterministic IDs and paths.
 - [x] Typed helpers: `createClaimNote`, `createSourceNote`, `createOutlineNote`, `createDraftNote`.
-- [ ] Cross-note link policy defined: how `topicIds`, `claimIds`, etc. are validated or maintained.
+- [x] Cross-note link policy defined: link fields (`topicIds`, `claimIds`, `sourceIds`, etc.) are caller-supplied ID strings. No server-side referential integrity check in v1 — links are declared in frontmatter by the caller, and maintaining reverse links (e.g. adding a draft ID back to the topic's `draftIds`) is left to the calling agent or future worker logic.
 
 ## API surface
 
@@ -51,5 +51,5 @@ This checklist gates the v1 release. All items must be checked before tagging `v
 - [x] README documents architecture, safety model, and local dev setup.
 - [x] `sandbox/dev-vault` contains representative notes for each kind.
 - [x] `vitest.smoke.config.ts` enables one-command dev-vault smoke verification.
-- [ ] CONTRIBUTING.md documents the full local dev loop.
-- [ ] At least one end-to-end example showing note creation from topic to draft.
+- [x] CONTRIBUTING.md documents the full local dev loop.
+- [x] At least one end-to-end example showing note creation from topic to draft (`examples/flows/topic-to-draft.ts`).

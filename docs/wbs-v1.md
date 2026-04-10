@@ -35,7 +35,7 @@ Status values used here:
 - `done` Add source-note creation helper.
 - `done` Add outline-note creation helper.
 - `done` Add draft-note creation helper.
-- `next` Define how cross-note links should be created or maintained.
+- `done` Define how cross-note links should be created or maintained.
 
 ## 4. API surface
 
@@ -58,7 +58,7 @@ Status values used here:
 
 - `done` Add scan-based search and note listing.
 - `done` Add invalid-note reporting and vault health summaries.
-- `next` Add worker-backed index refresh hooks.
+- `done` Add worker-backed index refresh hooks.
 - `later` Add richer ranking and graph traversal.
 - `later` Add semantic retrieval only if the simpler model proves insufficient.
 
@@ -78,7 +78,7 @@ Status values used here:
 - `done` Add local dev vault guidance.
 - `done` Add planning documents.
 - `done` Add contribution and testing guide.
-- `next` Add examples showing expected note creation flows end to end.
+- `done` Add examples showing expected note creation flows end to end.
 
 ## Suggested delivery order
 
