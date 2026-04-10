@@ -281,6 +281,12 @@ export const toolDefinitions = [
     description:
       "Return all notes that failed validation, each with a machine-readable error code and reason.",
     inputSchema: { type: "object", properties: {} }
+  },
+  {
+    name: "get_vault_diagnostics",
+    description:
+      "Return broken-link and orphan-note diagnostics for the readable vault graph, along with invalid-note counts.",
+    inputSchema: { type: "object", properties: {} }
   }
 ] as const;
 
@@ -379,6 +385,11 @@ export async function dispatchTool(name: string, rawArgs: unknown, deps: ToolDep
 
       case "get_invalid_notes": {
         const result = await deps.searchService.getInvalidNotes();
+        return asTextResult(result);
+      }
+
+      case "get_vault_diagnostics": {
+        const result = await deps.searchService.getVaultDiagnostics();
         return asTextResult(result);
       }
 

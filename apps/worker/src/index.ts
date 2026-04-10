@@ -11,9 +11,10 @@ loadDotenv({
 });
 
 async function runPass(searchService: SearchService, config: WorkerConfig): Promise<void> {
-  const [status, invalid] = await Promise.all([
+  const [status, invalid, diagnostics] = await Promise.all([
     searchService.getVaultStatus(),
-    searchService.getInvalidNotes()
+    searchService.getInvalidNotes(),
+    searchService.getVaultDiagnostics()
   ]);
 
   const summary = {
@@ -21,6 +22,7 @@ async function runPass(searchService: SearchService, config: WorkerConfig): Prom
     totalNotes: status.totalNotes,
     byKind: status.byKind,
     invalidCount: invalid.count,
+    diagnostics: diagnostics.summary,
     skipped: invalid.notes,
     indexedAt: status.checkedAt
   };

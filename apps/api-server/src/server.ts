@@ -80,6 +80,10 @@ export function buildServer(config: ApiServerConfig) {
     return searchService.getInvalidNotes();
   });
 
+  app.get("/vault/diagnostics", async () => {
+    return searchService.getVaultDiagnostics();
+  });
+
   app.get("/notes", async (request) => {
     const query = listNotesQuerySchema.parse(request.query);
     const baseOptions = {

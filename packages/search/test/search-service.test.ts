@@ -108,4 +108,42 @@ describe("SearchService related notes", () => {
       await rm(vaultRoot, { recursive: true, force: true });
     }
   });
+
+  it("reports broken links and orphaned notes in diagnostics", async () => {
+    const vaultRoot = await createTestVault();
+    const service = new SearchService(new VaultAdapter({ vaultRoot }));
+
+    try {
+      await writeFile(
+        path.join(vaultRoot, "02 Sources/orphan-source.md"),
+        `---
+id: orphan-source
+type: source
+title: Orphan Source
+status: seed
+tags: []
+createdAt: 2026-04-09T00:00:00Z
+updatedAt: 2026-04-09T00:00:00Z
+sourceKind: website
+authors: []
+topicIds: []
+claimIds: []
+---
+
+Orphan body.
+`,
+        "utf8"
+      );
+
+      const diagnostics = await service.getVaultDiagnostics();
+      expect(diagnostics.summary.brokenLinks).toBe(1);
+      expect(diagnostics.summary.orphanedNotes).toBe(1);
+      expect(diagnostics.issues.map((issue) => issue.code)).toContain("MISSING_LINKED_NOTE");
+      expect(diagnostics.issues.map((issue) => issue.code)).toContain("ORPHANED_NOTE");
+      expect(diagnostics.issues.find((issue) => issue.noteId === "topic-test")?.relatedIds).toContain("claim-missing");
+      expect(diagnostics.issues.find((issue) => issue.noteId === "orphan-source")?.severity).toBe("warning");
+    } finally {
+      await rm(vaultRoot, { recursive: true, force: true });
+    }
+  });
 });

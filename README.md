@@ -135,6 +135,7 @@ API_PORT=3000
 - `GET /notes/related?id=...` — one-hop related-note traversal + missing linked IDs
 - `GET /vault/status` — note counts by kind + skipped list
 - `GET /vault/invalid` — structured list of notes that failed validation
+- `GET /vault/diagnostics` — broken-link and orphan-note diagnostics for the readable graph
 - `POST /notes/validate`
 - `POST /notes/template`
 - `POST /claims`
@@ -158,6 +159,7 @@ API_PORT=3000
 - `oww.get_policy`
 - `oww.get_vault_status`
 - `oww.get_invalid_notes`
+- `oww.get_vault_diagnostics`
 
 ## Roadmap
 

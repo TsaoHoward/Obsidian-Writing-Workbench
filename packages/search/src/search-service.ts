@@ -53,6 +53,32 @@ export interface RelatedNotesResult {
   checkedAt: string;
 }
 
+export type VaultDiagnosticSeverity = "error" | "warning" | "info";
+
+export interface VaultDiagnosticIssue {
+  severity: VaultDiagnosticSeverity;
+  code: "MISSING_LINKED_NOTE" | "ORPHANED_NOTE";
+  noteId: string;
+  path: string;
+  message: string;
+  relatedIds: string[];
+}
+
+export interface VaultDiagnosticsSummary {
+  totalNotes: number;
+  invalidNotes: number;
+  brokenLinks: number;
+  orphanedNotes: number;
+  issueCount: number;
+}
+
+export interface VaultDiagnosticsReport {
+  summary: VaultDiagnosticsSummary;
+  issues: VaultDiagnosticIssue[];
+  skipped: SkippedNote[];
+  checkedAt: string;
+}
+
 export interface NoteKindCount {
   kind: NoteKind;
   count: number;
@@ -213,6 +239,76 @@ export class SearchService {
     };
   }
 
+  async getVaultDiagnostics(): Promise<VaultDiagnosticsReport> {
+    const { notes, skipped } = await this.loadValidatedNotes();
+    const noteById = new Map(notes.map((note) => [note.frontmatter.id, note]));
+    const inboundRefs = new Map<string, Set<string>>();
+    const missingByNote = new Map<string, { note: AnyNoteDocument; ids: Set<string> }>();
+
+    for (const note of notes) {
+      for (const reference of dedupeReferences(collectReferences(note))) {
+        const target = noteById.get(reference.id);
+        if (!target) {
+          const entry = missingByNote.get(note.frontmatter.id) ?? { note, ids: new Set<string>() };
+          entry.ids.add(reference.id);
+          missingByNote.set(note.frontmatter.id, entry);
+          continue;
+        }
+
+        const inbound = inboundRefs.get(reference.id) ?? new Set<string>();
+        inbound.add(note.frontmatter.id);
+        inboundRefs.set(reference.id, inbound);
+      }
+    }
+
+    const issues: VaultDiagnosticIssue[] = [];
+
+    for (const entry of missingByNote.values()) {
+      const relatedIds = Array.from(entry.ids).sort();
+      issues.push({
+        severity: "error",
+        code: "MISSING_LINKED_NOTE",
+        noteId: entry.note.frontmatter.id,
+        path: entry.note.path,
+        message: `References missing notes: ${relatedIds.join(", ")}`,
+        relatedIds
+      });
+    }
+
+    for (const note of notes) {
+      const validOutgoing = dedupeReferences(collectReferences(note)).filter((reference) => noteById.has(reference.id));
+      const inboundCount = inboundRefs.get(note.frontmatter.id)?.size ?? 0;
+
+      if (validOutgoing.length === 0 && inboundCount === 0) {
+        issues.push({
+          severity: "warning",
+          code: "ORPHANED_NOTE",
+          noteId: note.frontmatter.id,
+          path: note.path,
+          message: "Note has no incoming or outgoing links in the readable vault graph.",
+          relatedIds: []
+        });
+      }
+    }
+
+    issues.sort(compareDiagnosticIssues);
+
+    return {
+      summary: {
+        totalNotes: notes.length,
+        invalidNotes: skipped.length,
+        brokenLinks: issues
+          .filter((issue) => issue.code === "MISSING_LINKED_NOTE")
+          .reduce((sum, issue) => sum + issue.relatedIds.length, 0),
+        orphanedNotes: issues.filter((issue) => issue.code === "ORPHANED_NOTE").length,
+        issueCount: issues.length
+      },
+      issues,
+      skipped,
+      checkedAt: new Date().toISOString()
+    };
+  }
+
   async getVaultStatus(): Promise<VaultStatus> {
     const { notes, skipped } = await this.loadValidatedNotes();
 
@@ -307,6 +403,37 @@ function collectReferences(note: AnyNoteDocument): NoteReference[] {
         ...note.frontmatter.sourceIds.map((id) => ({ id, reason: "draft.sourceIds" }))
       ];
   }
+}
+
+function dedupeReferences(references: NoteReference[]): NoteReference[] {
+  const seen = new Set<string>();
+  const unique: NoteReference[] = [];
+
+  for (const reference of references) {
+    const key = `${reference.reason}:${reference.id}`;
+    if (seen.has(key)) {
+      continue;
+    }
+
+    seen.add(key);
+    unique.push(reference);
+  }
+
+  return unique;
+}
+
+function compareDiagnosticIssues(left: VaultDiagnosticIssue, right: VaultDiagnosticIssue): number {
+  const severityRank: Record<VaultDiagnosticSeverity, number> = {
+    error: 0,
+    warning: 1,
+    info: 2
+  };
+
+  return (
+    severityRank[left.severity] - severityRank[right.severity] ||
+    left.code.localeCompare(right.code) ||
+    left.noteId.localeCompare(right.noteId)
+  );
 }
 
 function scoreNote(note: AnyNoteDocument, normalizedQuery: string): number {

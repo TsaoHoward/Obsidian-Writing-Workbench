@@ -355,4 +355,72 @@ Claim body.
       await rm(vaultRoot, { recursive: true, force: true });
     }
   });
+
+  it("returns vault diagnostics with broken-link and orphan warnings", async () => {
+    const vaultRoot = await createTestVault();
+    const app = buildServer({
+      vaultRoot,
+      host: "127.0.0.1",
+      port: 3000
+    });
+
+    try {
+      await writeFile(
+        path.join(vaultRoot, "03 Claims/missing-link-claim.md"),
+        `---
+id: claim-missing-link
+type: claim
+title: Missing-link claim
+status: review
+tags: []
+createdAt: 2026-04-09T00:00:00Z
+updatedAt: 2026-04-09T00:00:00Z
+statement: This claim intentionally points to a missing source.
+stance: supporting
+topicIds: [topic-test]
+sourceIds: [source-missing]
+confidence: 0.8
+---
+
+Claim body.
+`,
+        "utf8"
+      );
+
+      await writeFile(
+        path.join(vaultRoot, "02 Sources/orphan-source.md"),
+        `---
+id: orphan-source
+type: source
+title: Orphan Source
+status: seed
+tags: []
+createdAt: 2026-04-09T00:00:00Z
+updatedAt: 2026-04-09T00:00:00Z
+sourceKind: website
+authors: []
+topicIds: []
+claimIds: []
+---
+
+Orphan body.
+`,
+        "utf8"
+      );
+
+      const diagnosticsResponse = await app.inject({
+        method: "GET",
+        url: "/vault/diagnostics"
+      });
+      expect(diagnosticsResponse.statusCode).toBe(200);
+      const payload = diagnosticsResponse.json();
+      expect(payload.summary.brokenLinks).toBe(1);
+      expect(payload.summary.orphanedNotes).toBe(1);
+      expect(payload.issues.map((issue: { code: string }) => issue.code)).toContain("MISSING_LINKED_NOTE");
+      expect(payload.issues.map((issue: { code: string }) => issue.code)).toContain("ORPHANED_NOTE");
+    } finally {
+      await app.close();
+      await rm(vaultRoot, { recursive: true, force: true });
+    }
+  });
 });
