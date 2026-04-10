@@ -28,7 +28,10 @@ The current main branch already provides:
 - An MCP stdio server.
 - Local dev vault support.
 - Template-based note creation and claim-note creation.
-- Automated tests for folder policy, schema handling, factories, and API flows.
+- Ranked search hits with snippets, related-note traversal, and vault diagnostics.
+- Explicit worker refresh jobs with a lightweight in-memory retrieval cache.
+- Runnable end-to-end examples for topic-to-draft and topic-to-related-note flows.
+- Automated tests for folder policy, schema handling, factories, API flows, MCP flows, and worker refresh behavior.
 
 ## Milestones
 
@@ -73,7 +76,7 @@ Exit signal:
 
 ### M3 Retrieval and background jobs
 
-Status: next
+Status: completed
 
 - Improve search ranking beyond scan-and-match.
 - Expand worker-backed indexing from scaffold hooks to durable refresh jobs.
@@ -125,9 +128,9 @@ Verified on 2026-04-10:
 
 ## Immediate next PRs
 
-1. Improve retrieval quality with ranking, indexing, and related-note traversal.
-2. Strengthen workflow diagnostics around missing links, drift, and note health.
-3. Preserve the backend-first, MCP-first architecture with clear seams for future remote hardening (auth, tracing, rate-limits, sync adapters).
+1. Preserve the backend-first, MCP-first architecture with clear seams for future remote hardening (auth, tracing, rate-limits, sync adapters).
+2. Add operator guidance and release-facing documentation for refresh and diagnostics workflows.
+3. Reassess whether the current lightweight indexing model is sufficient before introducing heavier retrieval infrastructure.
 
 ## V2 planning docs
 

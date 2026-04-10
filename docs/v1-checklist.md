@@ -29,11 +29,13 @@ This checklist gates the v1 release. All items must be checked before tagging `v
 - [x] `PUT /note` updates an existing note; returns 403 for protected paths, 404 for missing.
 - [x] `GET /vault/status` returns note counts by kind and any skipped notes.
 - [x] `GET /vault/invalid` returns a structured list of all notes that failed validation.
+- [x] `GET /notes/related` returns related notes and missing linked IDs for a topic-centric workflow.
+- [x] `GET /vault/diagnostics` returns broken-link and orphan-note diagnostics.
 
 ## MCP surface
 
 - [x] All API capabilities exposed as MCP tools via `dispatchTool`.
-- [x] `oww.get_invalid_notes` available for vault health inspection.
+- [x] `oww.get_related_notes`, `oww.get_invalid_notes`, and `oww.get_vault_diagnostics` available for retrieval and vault-health inspection.
 - [x] MCP server builds and starts without error against the dev vault in a real stdio launch (`VAULT_ROOT=./sandbox/dev-vault`).
 
 ## Verification
@@ -41,8 +43,8 @@ This checklist gates the v1 release. All items must be checked before tagging `v
 - [x] Folder policy tests pass.
 - [x] Schema normalization tests pass.
 - [x] Note factory tests pass (includes path and ID regression tests).
-- [x] API integration tests pass (9 assertions across 3 test groups).
-- [x] MCP integration tests pass (12 assertions).
+- [x] API integration tests pass, including retrieval and diagnostics routes.
+- [x] MCP integration tests pass, including related-note and diagnostics tools.
 - [x] Dev-vault smoke tests pass (`vitest run --config vitest.smoke.config.ts`).
 - [x] No `console.warn` output from the smoke test for invalid dev-vault notes.
 
@@ -50,9 +52,10 @@ This checklist gates the v1 release. All items must be checked before tagging `v
 
 - `corepack pnpm build` ✅
 - `corepack pnpm typecheck` ✅
-- `corepack pnpm test` ✅ — 6 test files, 38 tests passed
+- `corepack pnpm test` ✅ — 8 test files, 50 tests passed
 - `corepack pnpm vitest run --config vitest.smoke.config.ts` ✅ — 1 file, 7 tests passed
 - `VAULT_ROOT=./sandbox/dev-vault; corepack pnpm --filter @oww/mcp-server build` then `corepack pnpm --filter @oww/mcp-server start` ✅ — startup completed without error output
+- `node --import tsx/esm examples/flows/topic-to-draft.ts` and `node --import tsx/esm examples/flows/topic-to-related.ts` ✅ — both end-to-end example flows completed successfully
 
 ## Developer experience
 
@@ -60,4 +63,4 @@ This checklist gates the v1 release. All items must be checked before tagging `v
 - [x] `sandbox/dev-vault` contains representative notes for each kind.
 - [x] `vitest.smoke.config.ts` enables one-command dev-vault smoke verification.
 - [x] CONTRIBUTING.md documents the full local dev loop.
-- [x] At least one end-to-end example showing note creation from topic to draft (`examples/flows/topic-to-draft.ts`).
+- [x] End-to-end examples cover both note creation and retrieval workflows (`examples/flows/topic-to-draft.ts`, `examples/flows/topic-to-related.ts`).

@@ -180,10 +180,10 @@ These examples walk through creation, retrieval, and diagnostics without requiri
 
 ### Near-term
 
-- Add better search ranking and note graph traversal.
-- Expand worker-backed indexing beyond scan-on-request.
-- Strengthen diagnostics for missing links, skipped notes, and vault drift.
+- Preserve and refine the new ranked retrieval, related-note traversal, and diagnostics workflows.
+- Add operator guidance for refresh/index workflows and release usage patterns.
 - Prepare remote-ready hardening such as auth, tracing, and rate-limits.
+- Reassess whether the current lightweight indexing model is sufficient before adding heavier retrieval infrastructure.
 
 ### Later
 

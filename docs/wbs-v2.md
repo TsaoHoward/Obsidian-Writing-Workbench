@@ -12,27 +12,27 @@ Status values used here:
 
 ## 1. Retrieval foundation
 
-- `next` Design an index-backed search model that preserves current safety boundaries.
-- `next` Add stronger ranking signals for title, ID, and frontmatter matches.
-- `next` Return better snippets and summaries for search results.
+- `done` Design a lightweight in-memory indexed search model that preserves current safety boundaries.
+- `done` Add stronger ranking signals for title, ID, and frontmatter matches.
+- `done` Return better snippets and summaries for search results.
 - `later` Reassess whether semantic retrieval is needed after indexed search lands.
 
 ## 2. Note graph traversal
 
-- `next` Define traversal rules between topic, source, claim, outline, and draft notes.
-- `next` Add related-note queries for topic-centric workflows.
+- `done` Define traversal rules between topic, source, claim, outline, and draft notes.
+- `done` Add related-note queries for topic-centric workflows.
 - `later` Add richer graph views once the basic traversal contract stabilizes.
 
 ## 3. Vault diagnostics
 
-- `next` Detect broken links, unresolved IDs, and orphaned notes.
-- `next` Expand invalid-note reporting into a broader vault-health summary.
-- `next` Separate actionable errors from low-priority drift warnings.
+- `done` Detect broken links, unresolved IDs, and orphaned notes.
+- `done` Expand invalid-note reporting into a broader vault-health summary.
+- `done` Separate actionable errors from low-priority drift warnings.
 
 ## 4. Worker and indexing
 
-- `next` Replace the current worker placeholder loop with explicit refresh jobs.
-- `next` Add repeatable indexing hooks for retrieval and diagnostics passes.
+- `done` Replace the current worker placeholder loop with explicit refresh jobs.
+- `done` Add repeatable indexing hooks for retrieval and diagnostics passes.
 - `later` Add scheduled or event-driven refresh once the local job model is stable.
 
 ## 5. Remote-ready backend seam
@@ -43,20 +43,20 @@ Status values used here:
 
 ## 6. API and MCP surface
 
-- `next` Add matching retrieval and diagnostics endpoints to the API.
-- `next` Add corresponding MCP tools with aligned argument and result shapes.
+- `done` Add matching retrieval and diagnostics endpoints to the API.
+- `done` Add corresponding MCP tools with aligned argument and result shapes.
 - `later` Consider remote transport only after auth and deployment rules are defined.
 
 ## 7. Verification and performance
 
-- `next` Add regression tests for ranking, traversal, and diagnostics.
+- `done` Add regression tests for ranking, traversal, and diagnostics.
 - `next` Expand dev-vault fixtures to include broken-link and cross-note scenarios.
 - `next` Add a lightweight benchmark or smoke check for indexed retrieval.
 
 ## 8. Documentation and examples
 
 - `next` Publish the `v2` scope and work breakdown docs.
-- `next` Add one end-to-end example showing topic-to-related-notes discovery.
+- `done` Add one end-to-end example showing topic-to-related-notes discovery.
 - `later` Add operator guidance for running refresh and diagnostics workflows.
 
 ## Suggested delivery order

@@ -54,6 +54,16 @@ Deliver a workflow-aware retrieval and diagnostics layer while preserving the pr
 - Add realistic dev-vault fixtures for link graphs and broken-reference cases.
 - Add tests for ranking, traversal, diagnostics, and worker refresh behavior.
 
+## Current implementation snapshot (2026-04-10)
+
+Already in place on the main branch:
+
+- Ranked search results now return snippets for API and MCP clients.
+- Related-note traversal works across topic, source, claim, outline, and draft links.
+- Vault diagnostics report broken links and orphaned notes.
+- Worker refresh jobs can explicitly rebuild the retrieval/diagnostics snapshot.
+- Example flows demonstrate both topic-to-draft creation and topic-to-related-note discovery.
+
 ## Release criteria
 
 `v2` should not be considered complete until all of the following are true:
