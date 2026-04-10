@@ -276,10 +276,10 @@ export class SearchService {
     }
 
     for (const note of notes) {
-      const validOutgoing = dedupeReferences(collectReferences(note)).filter((reference) => noteById.has(reference.id));
+      const outgoingRefs = dedupeReferences(collectReferences(note));
       const inboundCount = inboundRefs.get(note.frontmatter.id)?.size ?? 0;
 
-      if (validOutgoing.length === 0 && inboundCount === 0) {
+      if (outgoingRefs.length === 0 && inboundCount === 0) {
         issues.push({
           severity: "warning",
           code: "ORPHANED_NOTE",

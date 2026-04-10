@@ -14,7 +14,8 @@
     "typecheck": "corepack pnpm -r typecheck",
     "dev:api": "corepack pnpm --filter @oww/api-server dev",
     "dev:mcp": "corepack pnpm --filter @oww/mcp-server dev",
-    "dev:worker": "corepack pnpm --filter @oww/worker dev"
+    "dev:worker": "corepack pnpm --filter @oww/worker dev",
+    "refresh:worker": "corepack pnpm --filter @oww/worker refresh"
   },
   "devDependencies": {
     "@types/node": "*",

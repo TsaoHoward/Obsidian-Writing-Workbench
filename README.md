@@ -108,13 +108,16 @@ Protected folders are blocked from writes in v1. Destructive operations are inte
 3. Build everything with `pnpm build`.
 4. Run the API with `pnpm dev:api`.
 5. Run the MCP server with `pnpm dev:mcp`.
-6. Run the worker scaffold with `pnpm dev:worker`.
+6. Run the worker in watch mode with `pnpm dev:worker`.
+7. Trigger a one-shot refresh/index pass with `pnpm refresh:worker`.
 
 Example environment:
 
 ```bash
 VAULT_ROOT=./sandbox/dev-vault
 API_PORT=3000
+WORKER_RUN_MODE=watch
+WORKER_INDEX_PATH=./sandbox/dev-vault/.oww-index.json
 ```
 
 ## Local dev vault
