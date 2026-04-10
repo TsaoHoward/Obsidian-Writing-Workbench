@@ -45,7 +45,7 @@ Status values used here:
 - `done` Add claim creation route.
 - `done` Add source, outline, and draft creation routes.
 
-- `next` Add clearer error payloads for skipped or invalid notes.
+- `done` Add clearer error payloads for skipped or invalid notes.
 
 ## 5. MCP surface
 
@@ -68,8 +68,8 @@ Status values used here:
 - `done` Add schema normalization tests.
 - `done` Add note factory tests.
 - `done` Add API integration tests.
-- `next` Add MCP integration tests.
-- `next` Add regression tests around path and ID generation.
+- `done` Add MCP integration tests.
+- `done` Add regression tests around path and ID generation.
 - `next` Add repeatable dev-vault smoke checks.
 
 ## 8. Documentation and developer UX
