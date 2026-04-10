@@ -307,4 +307,52 @@ describe("API server", () => {
       await rm(vaultRoot, { recursive: true, force: true });
     }
   });
+
+  it("returns related notes for a topic and reports missing references", async () => {
+    const vaultRoot = await createTestVault();
+    const app = buildServer({
+      vaultRoot,
+      host: "127.0.0.1",
+      port: 3000
+    });
+
+    try {
+      await writeFile(
+        path.join(vaultRoot, "03 Claims/topic-claim.md"),
+        `---
+id: claim-topic-linked
+type: claim
+title: Topic-linked claim
+status: review
+tags: []
+createdAt: 2026-04-09T00:00:00Z
+updatedAt: 2026-04-09T00:00:00Z
+statement: The topic should discover linked notes.
+stance: supporting
+topicIds: [topic-test]
+sourceIds: [source-existing-source, source-missing]
+confidence: 0.8
+---
+
+Claim body.
+`,
+        "utf8"
+      );
+
+      const relatedResponse = await app.inject({
+        method: "GET",
+        url: "/notes/related?id=topic-test"
+      });
+      expect(relatedResponse.statusCode).toBe(200);
+
+      const payload = relatedResponse.json();
+      expect(payload.note.id).toBe("topic-test");
+      expect(payload.related.map((entry: { note: { id: string } }) => entry.note.id)).toContain("source-existing-source");
+      expect(payload.related.map((entry: { note: { id: string } }) => entry.note.id)).toContain("claim-topic-linked");
+      expect(payload.missingIds).toContain("source-missing");
+    } finally {
+      await app.close();
+      await rm(vaultRoot, { recursive: true, force: true });
+    }
+  });
 });

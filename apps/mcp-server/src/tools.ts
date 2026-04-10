@@ -25,6 +25,16 @@ const readNoteArgsSchema = z.object({
   path: z.string().trim().min(1)
 });
 
+const relatedNotesArgsSchema = z
+  .object({
+    id: z.string().trim().min(1).optional(),
+    path: z.string().trim().min(1).optional(),
+    limit: z.coerce.number().int().positive().max(100).optional()
+  })
+  .refine((value) => Boolean(value.id || value.path), {
+    message: "Either id or path is required."
+  });
+
 const upsertNoteArgsSchema = z.object({
   path: z.string().trim().min(1),
   frontmatter: z.record(z.string(), z.unknown()),
@@ -64,6 +74,18 @@ export const toolDefinitions = [
       type: "object",
       properties: { path: { type: "string" } },
       required: ["path"]
+    }
+  },
+  {
+    name: "get_related_notes",
+    description: "Return notes related to a given note ID or path, plus missing linked IDs discovered in that local graph.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        id: { type: "string" },
+        path: { type: "string" },
+        limit: { type: "number" }
+      }
     }
   },
   {
@@ -282,6 +304,16 @@ export async function dispatchTool(name: string, rawArgs: unknown, deps: ToolDep
       case "read_note": {
         const parsed = readNoteArgsSchema.parse(args);
         const result = await deps.vaultAdapter.readValidatedNote(parsed.path);
+        return asTextResult(result);
+      }
+
+      case "get_related_notes": {
+        const parsed = relatedNotesArgsSchema.parse(args);
+        const result = await deps.searchService.getRelatedNotes({
+          ...(parsed.id ? { noteId: parsed.id } : {}),
+          ...(parsed.path ? { path: parsed.path } : {}),
+          ...(typeof parsed.limit === "number" ? { limit: parsed.limit } : {})
+        });
         return asTextResult(result);
       }
 

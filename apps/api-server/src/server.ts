@@ -33,6 +33,16 @@ const readNoteQuerySchema = z.object({
   path: z.string().trim().min(1)
 });
 
+const relatedNotesQuerySchema = z
+  .object({
+    id: z.string().trim().min(1).optional(),
+    path: z.string().trim().min(1).optional(),
+    limit: z.coerce.number().int().positive().max(100).optional()
+  })
+  .refine((value) => Boolean(value.id || value.path), {
+    message: "Either id or path is required."
+  });
+
 const upsertNoteBodySchema = z.object({
   path: z.string().trim().min(1),
   frontmatter: z.record(z.string(), z.unknown()),
@@ -92,6 +102,15 @@ export function buildServer(config: ApiServerConfig) {
     const note = await vaultAdapter.readValidatedNote(query.path);
 
     return { note };
+  });
+
+  app.get("/notes/related", async (request) => {
+    const query = relatedNotesQuerySchema.parse(request.query);
+    return searchService.getRelatedNotes({
+      ...(query.id ? { noteId: query.id } : {}),
+      ...(query.path ? { path: query.path } : {}),
+      ...(typeof query.limit === "number" ? { limit: query.limit } : {})
+    });
   });
 
   app.post("/notes/validate", async (request) => {

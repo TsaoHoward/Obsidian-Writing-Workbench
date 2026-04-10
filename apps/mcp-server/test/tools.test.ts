@@ -231,4 +231,40 @@ describe("MCP tool dispatcher", () => {
       await rm(vaultRoot, { recursive: true, force: true });
     }
   });
+
+  it("oww.get_related_notes returns related notes and missing ids", async () => {
+    const vaultRoot = await createTestVault();
+    try {
+      await writeFile(
+        path.join(vaultRoot, "03 Claims/topic-claim.md"),
+        `---
+id: claim-topic-linked
+type: claim
+title: Topic-linked claim
+status: review
+tags: []
+createdAt: 2026-04-09T00:00:00Z
+updatedAt: 2026-04-09T00:00:00Z
+statement: The topic should discover linked notes.
+stance: supporting
+topicIds: [topic-test]
+sourceIds: [source-missing]
+confidence: 0.8
+---
+
+Claim body.
+`,
+        "utf8"
+      );
+
+      const result = await dispatchTool("get_related_notes", { id: "topic-test" }, makeDeps(vaultRoot));
+      expect(result.isError).toBeFalsy();
+      const payload = JSON.parse(result.content[0].text);
+      expect(payload.note.id).toBe("topic-test");
+      expect(payload.related.map((entry: { note: { id: string } }) => entry.note.id)).toContain("claim-topic-linked");
+      expect(payload.missingIds).toContain("source-missing");
+    } finally {
+      await rm(vaultRoot, { recursive: true, force: true });
+    }
+  });
 });

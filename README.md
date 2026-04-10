@@ -132,6 +132,7 @@ API_PORT=3000
 - `GET /policies`
 - `GET /notes` — list or search readable notes (`?type=`, `?query=`, `?limit=`)
 - `GET /note?path=...`
+- `GET /notes/related?id=...` — one-hop related-note traversal + missing linked IDs
 - `GET /vault/status` — note counts by kind + skipped list
 - `GET /vault/invalid` — structured list of notes that failed validation
 - `POST /notes/validate`
@@ -146,6 +147,7 @@ API_PORT=3000
 
 - `oww.list_notes`
 - `oww.read_note`
+- `oww.get_related_notes`
 - `oww.validate_note`
 - `oww.create_note_from_template`
 - `oww.create_claim_note`
