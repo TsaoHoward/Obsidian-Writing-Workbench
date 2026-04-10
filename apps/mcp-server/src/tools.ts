@@ -253,6 +253,12 @@ export const toolDefinitions = [
     description:
       "Return a summary of all valid notes in the vault grouped by kind, plus any notes that failed validation.",
     inputSchema: { type: "object", properties: {} }
+  },
+  {
+    name: "oww.get_invalid_notes",
+    description:
+      "Return all notes that failed validation, each with a machine-readable error code and reason.",
+    inputSchema: { type: "object", properties: {} }
   }
 ] as const;
 
@@ -336,6 +342,11 @@ export async function dispatchTool(name: string, rawArgs: unknown, deps: ToolDep
 
       case "oww.get_vault_status": {
         const result = await deps.searchService.getVaultStatus();
+        return asTextResult(result);
+      }
+
+      case "oww.get_invalid_notes": {
+        const result = await deps.searchService.getInvalidNotes();
         return asTextResult(result);
       }
 

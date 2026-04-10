@@ -15,7 +15,7 @@ Status values used here:
 - `done` Define product intent and backend-first strategy.
 - `done` Define current architecture and package boundaries.
 - `done` Publish roadmap, v1 scope, and WBS documents.
-- `next` Define explicit v1 release criteria in one checklist that can gate release readiness.
+- `done` Define explicit v1 release criteria in one checklist that can gate release readiness.
 
 ## 2. Domain and safety
 
@@ -57,7 +57,7 @@ Status values used here:
 ## 6. Retrieval and worker
 
 - `done` Add scan-based search and note listing.
-- `next` Add invalid-note reporting and vault health summaries.
+- `done` Add invalid-note reporting and vault health summaries.
 - `next` Add worker-backed index refresh hooks.
 - `later` Add richer ranking and graph traversal.
 - `later` Add semantic retrieval only if the simpler model proves insufficient.
@@ -70,14 +70,14 @@ Status values used here:
 - `done` Add API integration tests.
 - `done` Add MCP integration tests.
 - `done` Add regression tests around path and ID generation.
-- `next` Add repeatable dev-vault smoke checks.
+- `done` Add repeatable dev-vault smoke checks.
 
 ## 8. Documentation and developer UX
 
 - `done` Add README with architecture and safety rules.
 - `done` Add local dev vault guidance.
 - `done` Add planning documents.
-- `next` Add contribution and testing guide.
+- `done` Add contribution and testing guide.
 - `next` Add examples showing expected note creation flows end to end.
 
 ## Suggested delivery order

@@ -217,4 +217,18 @@ describe("MCP tool dispatcher", () => {
       await rm(vaultRoot, { recursive: true, force: true });
     }
   });
+
+  it("oww.get_invalid_notes returns empty list when all notes are valid", async () => {
+    const vaultRoot = await createTestVault();
+    try {
+      const result = await dispatchTool("oww.get_invalid_notes", {}, makeDeps(vaultRoot));
+      expect(result.isError).toBeFalsy();
+      const report = JSON.parse(result.content[0].text);
+      expect(report.count).toBe(0);
+      expect(report.notes).toHaveLength(0);
+      expect(report.checkedAt).toBeTruthy();
+    } finally {
+      await rm(vaultRoot, { recursive: true, force: true });
+    }
+  });
 });

@@ -45,6 +45,12 @@ export interface VaultStatus {
   checkedAt: string;
 }
 
+export interface InvalidNotesReport {
+  count: number;
+  notes: SkippedNote[];
+  checkedAt: string;
+}
+
 export class SearchService {
   constructor(private readonly vaultAdapter: VaultAdapter) {}
 
@@ -123,6 +129,15 @@ export class SearchService {
       totalNotes: notes.length,
       byKind: noteKinds.map((kind) => ({ kind, count: counts.get(kind) ?? 0 })),
       skipped,
+      checkedAt: new Date().toISOString()
+    };
+  }
+
+  async getInvalidNotes(): Promise<InvalidNotesReport> {
+    const { skipped } = await this.loadValidatedNotes();
+    return {
+      count: skipped.length,
+      notes: skipped,
       checkedAt: new Date().toISOString()
     };
   }

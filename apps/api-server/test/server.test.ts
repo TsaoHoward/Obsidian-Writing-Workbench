@@ -294,6 +294,14 @@ describe("API server", () => {
       expect(status.byKind.find((k: { kind: string }) => k.kind === "source")?.count).toBe(2);
       expect(status.byKind.find((k: { kind: string }) => k.kind === "outline")?.count).toBe(1);
       expect(status.byKind.find((k: { kind: string }) => k.kind === "draft")?.count).toBe(1);
+
+      const invalidResponse = await app.inject({
+        method: "GET",
+        url: "/vault/invalid"
+      });
+      expect(invalidResponse.statusCode).toBe(200);
+      expect(invalidResponse.json().count).toBe(0);
+      expect(invalidResponse.json().notes).toHaveLength(0);
     } finally {
       await app.close();
       await rm(vaultRoot, { recursive: true, force: true });
