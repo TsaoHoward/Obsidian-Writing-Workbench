@@ -431,6 +431,14 @@ async function main() {
           type: "object",
           properties: {}
         }
+      },
+      {
+        name: "oww.get_vault_status",
+        description: "Return a summary of all valid notes in the vault grouped by kind, plus any notes that failed validation.",
+        inputSchema: {
+          type: "object",
+          properties: {}
+        }
       }
     ]
   }));
@@ -523,6 +531,11 @@ async function main() {
 
         case "oww.get_policy": {
           return asTextResult(vaultAdapter.getPolicy());
+        }
+
+        case "oww.get_vault_status": {
+          const result = await searchService.getVaultStatus();
+          return asTextResult(result);
         }
 
         default:

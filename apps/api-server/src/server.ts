@@ -62,6 +62,10 @@ export function buildServer(config: ApiServerConfig) {
     policy: vaultAdapter.getPolicy()
   }));
 
+  app.get("/vault/status", async () => {
+    return searchService.getVaultStatus();
+  });
+
   app.get("/notes", async (request) => {
     const query = listNotesQuerySchema.parse(request.query);
     const baseOptions = {

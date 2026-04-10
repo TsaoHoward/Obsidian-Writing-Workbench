@@ -213,4 +213,69 @@ describe("API server", () => {
       await rm(vaultRoot, { recursive: true, force: true });
     }
   });
+
+  it("creates source, outline, and draft notes and returns vault status", async () => {
+    const vaultRoot = await createTestVault();
+    const app = buildServer({
+      vaultRoot,
+      host: "127.0.0.1",
+      port: 3000
+    });
+
+    try {
+      const sourceResponse = await app.inject({
+        method: "POST",
+        url: "/sources",
+        payload: {
+          title: "MCP Overview",
+          topicIds: ["topic-test"],
+          sourceKind: "article",
+          authors: ["Author One"],
+          url: "https://example.com/mcp-overview"
+        }
+      });
+      expect(sourceResponse.statusCode).toBe(201);
+      expect(sourceResponse.json().note.frontmatter.type).toBe("source");
+
+      const outlineResponse = await app.inject({
+        method: "POST",
+        url: "/outlines",
+        payload: {
+          title: "Backend architecture outline",
+          topicId: "topic-test",
+          stage: "seed"
+        }
+      });
+      expect(outlineResponse.statusCode).toBe(201);
+      expect(outlineResponse.json().note.frontmatter.type).toBe("outline");
+
+      const draftResponse = await app.inject({
+        method: "POST",
+        url: "/drafts",
+        payload: {
+          title: "Backend architecture draft",
+          topicId: "topic-test",
+          stage: "zero-draft"
+        }
+      });
+      expect(draftResponse.statusCode).toBe(201);
+      expect(draftResponse.json().note.frontmatter.type).toBe("draft");
+
+      const statusResponse = await app.inject({
+        method: "GET",
+        url: "/vault/status"
+      });
+      expect(statusResponse.statusCode).toBe(200);
+      const status = statusResponse.json();
+      expect(status.totalNotes).toBe(4); // 1 topic seed + 1 source + 1 outline + 1 draft
+      expect(status.skipped).toHaveLength(0);
+      expect(status.byKind.find((k: { kind: string }) => k.kind === "topic")?.count).toBe(1);
+      expect(status.byKind.find((k: { kind: string }) => k.kind === "source")?.count).toBe(1);
+      expect(status.byKind.find((k: { kind: string }) => k.kind === "outline")?.count).toBe(1);
+      expect(status.byKind.find((k: { kind: string }) => k.kind === "draft")?.count).toBe(1);
+    } finally {
+      await app.close();
+      await rm(vaultRoot, { recursive: true, force: true });
+    }
+  });
 });

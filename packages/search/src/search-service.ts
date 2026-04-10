@@ -1,4 +1,4 @@
-import { type AnyNoteDocument, type NoteKind, type NoteSummary } from "@oww/core";
+import { type AnyNoteDocument, type NoteKind, type NoteSummary, noteKinds } from "@oww/core";
 import { toNoteSummary } from "@oww/note-schema";
 import { VaultAdapter } from "@oww/vault-adapter";
 
@@ -29,6 +29,18 @@ export interface SearchHit {
 export interface SearchNotesResult {
   hits: SearchHit[];
   skipped: SkippedNote[];
+}
+
+export interface NoteKindCount {
+  kind: NoteKind;
+  count: number;
+}
+
+export interface VaultStatus {
+  totalNotes: number;
+  byKind: NoteKindCount[];
+  skipped: SkippedNote[];
+  checkedAt: string;
 }
 
 export class SearchService {
@@ -90,6 +102,26 @@ export class SearchService {
       }));
 
     return { hits, skipped };
+  }
+
+  async getVaultStatus(): Promise<VaultStatus> {
+    const { notes, skipped } = await this.loadValidatedNotes();
+
+    const counts = new Map<NoteKind, number>();
+    for (const kind of noteKinds) {
+      counts.set(kind, 0);
+    }
+    for (const note of notes) {
+      const kind = note.frontmatter.type;
+      counts.set(kind, (counts.get(kind) ?? 0) + 1);
+    }
+
+    return {
+      totalNotes: notes.length,
+      byKind: noteKinds.map((kind) => ({ kind, count: counts.get(kind) ?? 0 })),
+      skipped,
+      checkedAt: new Date().toISOString()
+    };
   }
 }
 

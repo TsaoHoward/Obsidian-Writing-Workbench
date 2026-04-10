@@ -22,7 +22,7 @@ Status values used here:
 - `done` Define core note types and shared schemas.
 - `done` Define readable, writable, and protected folder policy.
 - `done` Enforce vault-root and relative-path guards.
-- `active` Support safe shared note factories.
+- `done` Support safe shared note factories.
 - `next` Finalize note ID and filename strategy.
 - `next` Split write behavior into clearer create-only and update-only operations.
 - `deferred` Add destructive operations only behind explicit design and safety review.
@@ -32,9 +32,9 @@ Status values used here:
 - `done` Validate arbitrary note documents before write.
 - `done` Add template-driven note generation.
 - `done` Add claim-note creation helper.
-- `next` Add source-note creation helper.
-- `next` Add outline-note creation helper.
-- `next` Add draft-note creation helper.
+- `done` Add source-note creation helper.
+- `done` Add outline-note creation helper.
+- `done` Add draft-note creation helper.
 - `next` Define how cross-note links should be created or maintained.
 
 ## 4. API surface
@@ -43,13 +43,14 @@ Status values used here:
 - `done` Add note validation route.
 - `done` Add template note creation route.
 - `done` Add claim creation route.
+- `done` Add source, outline, and draft creation routes.
 - `next` Add vault status and diagnostics routes.
 - `next` Add clearer error payloads for skipped or invalid notes.
 
 ## 5. MCP surface
 
 - `done` Add list, read, validate, template-create, claim-create, upsert, and policy tools.
-- `next` Add source, outline, and draft creation tools.
+- `done` Add source, outline, and draft creation tools.
 - `next` Add vault diagnostics and status tools.
 - `later` Add remote transport once auth and deployment rules are defined.
 
