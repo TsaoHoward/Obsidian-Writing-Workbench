@@ -97,8 +97,58 @@ export const createClaimNoteInputSchema = z.object({
   body: z.string().optional()
 });
 
+export const createSourceNoteInputSchema = z.object({
+  title: nonEmptyString,
+  topicIds: z.array(idSchema).min(1),
+  sourceKind: z.enum(sourceKindValues).default("website"),
+  authors: z.array(nonEmptyString).default([]),
+  url: z.string().url().optional(),
+  citation: nonEmptyString.optional(),
+  publishedAt: nonEmptyString.optional(),
+  claimIds: z.array(idSchema).default([]),
+  reliability: z.enum(["high", "medium", "low"]).optional(),
+  id: idSchema.optional(),
+  path: nonEmptyString.optional(),
+  status: z.enum(noteStatusValues).default("seed"),
+  tags: z.array(nonEmptyString).default([]),
+  body: z.string().optional()
+});
+
+export const createOutlineNoteInputSchema = z.object({
+  title: nonEmptyString,
+  topicId: idSchema,
+  claimIds: z.array(idSchema).default([]),
+  sourceIds: z.array(idSchema).default([]),
+  stage: z.enum(outlineStageValues).default("seed"),
+  targetAudience: nonEmptyString.optional(),
+  writingGoal: nonEmptyString.optional(),
+  id: idSchema.optional(),
+  path: nonEmptyString.optional(),
+  status: z.enum(noteStatusValues).default("seed"),
+  tags: z.array(nonEmptyString).default([]),
+  body: z.string().optional()
+});
+
+export const createDraftNoteInputSchema = z.object({
+  title: nonEmptyString,
+  topicId: idSchema,
+  outlineId: idSchema.optional(),
+  claimIds: z.array(idSchema).default([]),
+  sourceIds: z.array(idSchema).default([]),
+  stage: z.enum(draftStageValues).default("zero-draft"),
+  targetWords: z.number().int().positive().optional(),
+  id: idSchema.optional(),
+  path: nonEmptyString.optional(),
+  status: z.enum(noteStatusValues).default("seed"),
+  tags: z.array(nonEmptyString).default([]),
+  body: z.string().optional()
+});
+
 export type CreateNoteFromTemplateInput = z.infer<typeof createNoteFromTemplateInputSchema>;
 export type CreateClaimNoteInput = z.infer<typeof createClaimNoteInputSchema>;
+export type CreateSourceNoteInput = z.infer<typeof createSourceNoteInputSchema>;
+export type CreateOutlineNoteInput = z.infer<typeof createOutlineNoteInputSchema>;
+export type CreateDraftNoteInput = z.infer<typeof createDraftNoteInputSchema>;
 
 export interface NoteFactoryOptions {
   now?: Date;
@@ -247,6 +297,86 @@ export function createClaimNote(
       sourceIds: parsed.sourceIds,
       stance: parsed.stance,
       confidence: parsed.confidence,
+      id: parsed.id,
+      path: parsed.path,
+      status: parsed.status,
+      tags: parsed.tags,
+      body: parsed.body
+    },
+    options
+  );
+}
+
+export function createSourceNote(
+  input: CreateSourceNoteInput,
+  options: NoteFactoryOptions = {}
+): AnyNoteDocument {
+  const parsed = createSourceNoteInputSchema.parse(input);
+
+  return createNoteFromTemplate(
+    {
+      type: "source",
+      title: parsed.title,
+      topicIds: parsed.topicIds,
+      sourceKind: parsed.sourceKind,
+      authors: parsed.authors,
+      url: parsed.url,
+      citation: parsed.citation,
+      publishedAt: parsed.publishedAt,
+      claimIds: parsed.claimIds,
+      reliability: parsed.reliability,
+      id: parsed.id,
+      path: parsed.path,
+      status: parsed.status,
+      tags: parsed.tags,
+      body: parsed.body
+    },
+    options
+  );
+}
+
+export function createOutlineNote(
+  input: CreateOutlineNoteInput,
+  options: NoteFactoryOptions = {}
+): AnyNoteDocument {
+  const parsed = createOutlineNoteInputSchema.parse(input);
+
+  return createNoteFromTemplate(
+    {
+      type: "outline",
+      title: parsed.title,
+      topicId: parsed.topicId,
+      claimIds: parsed.claimIds,
+      sourceIds: parsed.sourceIds,
+      stage: parsed.stage,
+      targetAudience: parsed.targetAudience,
+      writingGoal: parsed.writingGoal,
+      id: parsed.id,
+      path: parsed.path,
+      status: parsed.status,
+      tags: parsed.tags,
+      body: parsed.body
+    },
+    options
+  );
+}
+
+export function createDraftNote(
+  input: CreateDraftNoteInput,
+  options: NoteFactoryOptions = {}
+): AnyNoteDocument {
+  const parsed = createDraftNoteInputSchema.parse(input);
+
+  return createNoteFromTemplate(
+    {
+      type: "draft",
+      title: parsed.title,
+      topicId: parsed.topicId,
+      outlineId: parsed.outlineId,
+      claimIds: parsed.claimIds,
+      sourceIds: parsed.sourceIds,
+      stage: parsed.stage,
+      targetWords: parsed.targetWords,
       id: parsed.id,
       path: parsed.path,
       status: parsed.status,

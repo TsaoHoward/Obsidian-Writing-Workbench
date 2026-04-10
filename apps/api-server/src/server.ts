@@ -7,8 +7,14 @@ import {
 import {
   createClaimNote,
   createClaimNoteInputSchema,
+  createDraftNote,
+  createDraftNoteInputSchema,
   createNoteFromTemplate,
   createNoteFromTemplateInputSchema,
+  createOutlineNote,
+  createOutlineNoteInputSchema,
+  createSourceNote,
+  createSourceNoteInputSchema,
   validateNoteDocument
 } from "@oww/note-schema";
 import { SearchService } from "@oww/search";
@@ -114,6 +120,33 @@ export function buildServer(config: ApiServerConfig) {
   app.post("/claims", async (request, reply) => {
     const body = createClaimNoteInputSchema.parse(request.body);
     const note = createClaimNote(body);
+    const savedNote = await vaultAdapter.upsertNote(note);
+
+    reply.code(201);
+    return { note: savedNote };
+  });
+
+  app.post("/sources", async (request, reply) => {
+    const body = createSourceNoteInputSchema.parse(request.body);
+    const note = createSourceNote(body);
+    const savedNote = await vaultAdapter.upsertNote(note);
+
+    reply.code(201);
+    return { note: savedNote };
+  });
+
+  app.post("/outlines", async (request, reply) => {
+    const body = createOutlineNoteInputSchema.parse(request.body);
+    const note = createOutlineNote(body);
+    const savedNote = await vaultAdapter.upsertNote(note);
+
+    reply.code(201);
+    return { note: savedNote };
+  });
+
+  app.post("/drafts", async (request, reply) => {
+    const body = createDraftNoteInputSchema.parse(request.body);
+    const note = createDraftNote(body);
     const savedNote = await vaultAdapter.upsertNote(note);
 
     reply.code(201);

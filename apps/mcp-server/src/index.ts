@@ -3,8 +3,14 @@ import { fileURLToPath } from "node:url";
 import {
   createClaimNote,
   createClaimNoteInputSchema,
+  createDraftNote,
+  createDraftNoteInputSchema,
   createNoteFromTemplate,
   createNoteFromTemplateInputSchema,
+  createOutlineNote,
+  createOutlineNoteInputSchema,
+  createSourceNote,
+  createSourceNoteInputSchema,
   validateNoteDocument
 } from "@oww/note-schema";
 import { SearchService } from "@oww/search";
@@ -329,6 +335,77 @@ async function main() {
         }
       },
       {
+        name: "oww.create_source_note",
+        description: "Create and persist a source note in the writable sources folder.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            title: { type: "string" },
+            topicIds: { type: "array", items: { type: "string" } },
+            sourceKind: {
+              type: "string",
+              enum: ["article", "paper", "book", "podcast", "video", "website", "interview", "other"]
+            },
+            authors: { type: "array", items: { type: "string" } },
+            url: { type: "string" },
+            citation: { type: "string" },
+            publishedAt: { type: "string" },
+            claimIds: { type: "array", items: { type: "string" } },
+            reliability: { type: "string", enum: ["high", "medium", "low"] },
+            id: { type: "string" },
+            path: { type: "string" },
+            status: { type: "string", enum: ["seed", "active", "review", "done"] },
+            tags: { type: "array", items: { type: "string" } },
+            body: { type: "string" }
+          },
+          required: ["title", "topicIds"]
+        }
+      },
+      {
+        name: "oww.create_outline_note",
+        description: "Create and persist an outline note in the writable outlines folder.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            title: { type: "string" },
+            topicId: { type: "string" },
+            claimIds: { type: "array", items: { type: "string" } },
+            sourceIds: { type: "array", items: { type: "string" } },
+            stage: { type: "string", enum: ["seed", "working", "ready"] },
+            targetAudience: { type: "string" },
+            writingGoal: { type: "string" },
+            id: { type: "string" },
+            path: { type: "string" },
+            status: { type: "string", enum: ["seed", "active", "review", "done"] },
+            tags: { type: "array", items: { type: "string" } },
+            body: { type: "string" }
+          },
+          required: ["title", "topicId"]
+        }
+      },
+      {
+        name: "oww.create_draft_note",
+        description: "Create and persist a draft note in the writable drafts folder.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            title: { type: "string" },
+            topicId: { type: "string" },
+            outlineId: { type: "string" },
+            claimIds: { type: "array", items: { type: "string" } },
+            sourceIds: { type: "array", items: { type: "string" } },
+            stage: { type: "string", enum: ["zero-draft", "revision", "polish"] },
+            targetWords: { type: "number" },
+            id: { type: "string" },
+            path: { type: "string" },
+            status: { type: "string", enum: ["seed", "active", "review", "done"] },
+            tags: { type: "array", items: { type: "string" } },
+            body: { type: "string" }
+          },
+          required: ["title", "topicId"]
+        }
+      },
+      {
         name: "oww.upsert_note",
         description: "Create or update a note in a writable vault folder.",
         inputSchema: {
@@ -412,6 +489,27 @@ async function main() {
         case "oww.create_claim_note": {
           const args = createClaimNoteInputSchema.parse(request.params.arguments ?? {});
           const note = createClaimNote(args);
+          const result = await vaultAdapter.upsertNote(note);
+          return asTextResult({ note: result });
+        }
+
+        case "oww.create_source_note": {
+          const args = createSourceNoteInputSchema.parse(request.params.arguments ?? {});
+          const note = createSourceNote(args);
+          const result = await vaultAdapter.upsertNote(note);
+          return asTextResult({ note: result });
+        }
+
+        case "oww.create_outline_note": {
+          const args = createOutlineNoteInputSchema.parse(request.params.arguments ?? {});
+          const note = createOutlineNote(args);
+          const result = await vaultAdapter.upsertNote(note);
+          return asTextResult({ note: result });
+        }
+
+        case "oww.create_draft_note": {
+          const args = createDraftNoteInputSchema.parse(request.params.arguments ?? {});
+          const note = createDraftNote(args);
           const result = await vaultAdapter.upsertNote(note);
           return asTextResult({ note: result });
         }
