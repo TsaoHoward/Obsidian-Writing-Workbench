@@ -15,7 +15,10 @@
     "dev:api": "corepack pnpm --filter @oww/api-server dev",
     "dev:mcp": "corepack pnpm --filter @oww/mcp-server dev",
     "dev:worker": "corepack pnpm --filter @oww/worker dev",
-    "refresh:worker": "corepack pnpm --filter @oww/worker refresh"
+    "refresh:worker": "corepack pnpm --filter @oww/worker refresh",
+    "demo:related": "node --import tsx/esm examples/flows/topic-to-related.ts",
+    "demo:draft": "node --import tsx/esm examples/flows/topic-to-draft.ts",
+    "demo:v2": "node --import tsx/esm examples/flows/topic-to-related.ts && node --import tsx/esm examples/flows/topic-to-draft.ts"
   },
   "devDependencies": {
     "@types/node": "*",

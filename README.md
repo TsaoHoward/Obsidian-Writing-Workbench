@@ -10,6 +10,7 @@ Portable AI-assisted writing infrastructure for an Obsidian vault. The vault sta
 - See [docs/wbs-v1.md](./docs/wbs-v1.md) for the lightweight work breakdown structure.
 - See [docs/v2-scope.md](./docs/v2-scope.md) for the proposed `v2` scope and release criteria.
 - See [docs/wbs-v2.md](./docs/wbs-v2.md) for the `v2` delivery breakdown.
+- See [docs/demo-v2.md](./docs/demo-v2.md) for the local V2 demo walkthrough.
 - See [CONTRIBUTING.md](./CONTRIBUTING.md) for the local dev loop and testing guide.
 
 ## Purpose
