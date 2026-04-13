@@ -11,6 +11,7 @@ This document explains the local development loop, the testing strategy, and how
 
 ```bash
 pnpm install
+pnpm seed:dev-vault
 ```
 
 ## Build
@@ -50,7 +51,7 @@ Tests live in `apps/**/test/` and `packages/**/test/`. The test suite covers:
 Smoke tests run against the real `sandbox/dev-vault` and are excluded from the default test run:
 
 ```bash
-.\node_modules\.bin\vitest.CMD run --config vitest.smoke.config.ts
+pnpm smoke:dev-vault
 ```
 
 Run smoke tests after:
@@ -59,9 +60,29 @@ Run smoke tests after:
 - Adding a new API route or MCP tool
 - Modifying `sandbox/dev-vault` note content
 
+## End-to-end tests
+
+The repo also includes a build-artifact e2e test that exercises the seeded vault through the API server, worker refresh flow, and MCP tool dispatcher.
+
+```bash
+pnpm build
+pnpm test:e2e
+pnpm test:e2e:api
+pnpm test:e2e:mcp
+```
+
+This path uses Node's built-in test runner against compiled `dist/` files with `--test-isolation=none`, so it remains useful even when child-process-based tooling is blocked by local process restrictions.
+
 ## Local dev vault
 
 `sandbox/dev-vault` contains one representative note per note kind. It is excluded from Git.
+
+Generate or refresh it with:
+
+```bash
+pnpm seed:dev-vault
+pnpm seed:dev-vault:clean
+```
 
 Use it to test the API server and MCP server against realistic content without coupling the project to your production vault.
 
@@ -93,7 +114,10 @@ Update `packages/core/test/folder-policy.test.ts` when changing policy.
 .\node_modules\.bin\tsc.CMD -p apps/api-server/tsconfig.json
 .\node_modules\.bin\tsc.CMD -p apps/mcp-server/tsconfig.json
 .\node_modules\.bin\vitest.CMD run
-.\node_modules\.bin\vitest.CMD run --config vitest.smoke.config.ts
+pnpm smoke:dev-vault
+node --test --test-isolation=none e2e/dev-vault.e2e.test.mjs
+node --test --test-isolation=none e2e/api-http.e2e.test.mjs
+node --test --test-isolation=none e2e/mcp-stdio.e2e.test.mjs
 ```
 
-All 38 unit/integration tests and 7 smoke tests must pass.
+All unit/integration tests, smoke tests, and e2e tests must pass.

@@ -28,6 +28,7 @@ This runs both example flows:
 Start the API server against the built-in sandbox vault:
 
 ```powershell
+pnpm seed:dev-vault
 $env:VAULT_ROOT = "./sandbox/dev-vault"
 corepack pnpm dev:api
 ```
@@ -45,6 +46,7 @@ Then open these URLs in a browser:
 To show the retrieval/diagnostics snapshot being rebuilt:
 
 ```powershell
+pnpm seed:dev-vault
 $env:VAULT_ROOT = "./sandbox/dev-vault"
 $env:WORKER_INDEX_PATH = Join-Path $env:TEMP "oww-worker-index.json"
 corepack pnpm refresh:worker

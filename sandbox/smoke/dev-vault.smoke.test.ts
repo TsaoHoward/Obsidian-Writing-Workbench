@@ -95,6 +95,38 @@ describe("dev-vault smoke checks", () => {
     }
   });
 
+  it("GET /notes/related returns the seeded cross-linked notes", async () => {
+    const app = buildServer(config);
+    try {
+      const response = await app.inject({
+        method: "GET",
+        url: "/notes/related?id=topic-portable-ai-writing-backend"
+      });
+      expect(response.statusCode).toBe(200);
+      const body = response.json();
+      expect(body.note.id).toBe("topic-portable-ai-writing-backend");
+      expect(body.related).toHaveLength(4);
+      expect(body.missingIds).toEqual([]);
+    } finally {
+      await app.close();
+    }
+  });
+
+  it("GET /vault/diagnostics reports a clean seeded dev vault", async () => {
+    const app = buildServer(config);
+    try {
+      const response = await app.inject({ method: "GET", url: "/vault/diagnostics" });
+      expect(response.statusCode).toBe(200);
+      const report = response.json();
+      expect(report.summary.invalidNotes).toBe(0);
+      expect(report.summary.brokenLinks).toBe(0);
+      expect(report.summary.orphanedNotes).toBe(0);
+      expect(report.issues).toHaveLength(0);
+    } finally {
+      await app.close();
+    }
+  });
+
   it("GET /notes?type=topic returns only topic notes", async () => {
     const app = buildServer(config);
     try {

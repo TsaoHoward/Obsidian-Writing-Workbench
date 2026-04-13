@@ -106,12 +106,13 @@ Protected folders are blocked from writes in v1. Destructive operations are inte
 ## Quick start
 
 1. Install dependencies with `pnpm install`.
-2. For local development, use the built-in `sandbox/dev-vault` path or point `VAULT_ROOT` to your own vault.
-3. Build everything with `pnpm build`.
-4. Run the API with `pnpm dev:api`.
-5. Run the MCP server with `pnpm dev:mcp`.
-6. Run the worker in watch mode with `pnpm dev:worker`.
-7. Trigger a one-shot refresh/index pass with `pnpm refresh:worker` to warm the latest retrieval/diagnostics snapshot.
+2. If you want the built-in sandbox vault, generate it with `pnpm seed:dev-vault`.
+3. For local development, use `sandbox/dev-vault` or point `VAULT_ROOT` to your own vault.
+4. Build everything with `pnpm build`.
+5. Run the API with `pnpm dev:api`.
+6. Run the MCP server with `pnpm dev:mcp`.
+7. Run the worker in watch mode with `pnpm dev:worker`.
+8. Trigger a one-shot refresh/index pass with `pnpm refresh:worker` to warm the latest retrieval/diagnostics snapshot.
 
 Example environment:
 
@@ -133,10 +134,28 @@ node --import tsx/esm examples/flows/topic-to-related.ts
 
 These examples walk through creation, retrieval, and diagnostics without requiring a separate server process.
 
+## E2E verification
+
+Run the built-artifact e2e test after compiling the workspace:
+
+```bash
+pnpm build
+pnpm test:e2e
+```
+
+This e2e path uses Node's built-in test runner against `dist/` outputs with `--test-isolation=none`, instead of the Vitest runtime.
+
+It covers:
+
+- API + worker + MCP dispatcher flow
+- Real HTTP calls against a spawned API server process
+- MCP stdio transport handshake against the built server process
+
 ## Local dev vault
 
 - Keep your real writing vault outside the repo.
 - Use `sandbox/dev-vault` as a local-only development sandbox.
+- Generate or refresh it with `pnpm seed:dev-vault` or `pnpm seed:dev-vault:clean`.
 - The sandbox is ignored by Git so test notes and generated drafts do not pollute the repository.
 - This gives you a predictable vault layout for backend and MCP testing without coupling the project to production content.
 
